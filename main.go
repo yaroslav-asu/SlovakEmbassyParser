@@ -1,15 +1,20 @@
 package main
 
 import (
+	"fmt"
 	"main/internal/logger"
 	"main/internal/login"
-	"main/internal/variables"
+	"main/internal/utils/random"
+	"main/internal/utils/variables"
+	"main/parser"
 )
 
 func main() {
 	variables.InitEnv()
 	logger.InitLogger()
+	random.InitRandom()
 
-	_ = login.Login()
-	//fmt.Println(login.CheckIsLoggedIn(client))
+	client := login.Login()
+	siteParser := parser.NewParser(client)
+	fmt.Println(siteParser.GetEmbassyCities())
 }

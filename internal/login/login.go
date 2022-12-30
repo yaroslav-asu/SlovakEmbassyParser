@@ -3,8 +3,8 @@ package login
 import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
-	"main/internal/functions"
-	"main/internal/variables"
+	"main/internal/utils/functions"
+	"main/internal/utils/variables"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"

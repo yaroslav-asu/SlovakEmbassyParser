@@ -3,14 +3,13 @@ package logger
 import (
 	"go.uber.org/zap"
 	"log"
-	"os"
+	"main/internal/utils/variables"
 )
 
 func InitLogger() {
-	runningMode := os.Getenv("RUNNING_MODE")
 	var logger *zap.Logger
 	var err error
-	switch runningMode {
+	switch variables.RunningMode {
 	case "dev":
 		logger, err = zap.NewDevelopment()
 	case "prod":

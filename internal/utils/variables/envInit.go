@@ -6,9 +6,12 @@ import (
 	"os"
 )
 
-var SiteUrl string
-var DefaultUserName string
-var DefaultUserPassword string
+var (
+	SiteUrl             string
+	DefaultUserName     string
+	DefaultUserPassword string
+	RunningMode         string
+)
 
 func InitEnv() {
 	zap.L().Info("Started to initialize environmental variables")
