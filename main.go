@@ -17,8 +17,4 @@ func main() {
 	siteParser := parser.NewParser(client)
 	dataBase := db.Connect()
 	db.UpdateCities(dataBase, siteParser)
-	//dataBase.Create(&models.City{Name: "asdf", CityId: "123"})
-
-	//dataBase.First(&models.City{CityId: "123", Name: "asdf"}, "city_id = ?", "123")
-	//siteParser.UpdateEmbassyCities(dataBase)
 }
