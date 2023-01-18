@@ -3,8 +3,8 @@ package login
 import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
-	"main/internal/utils/functions"
-	"main/internal/utils/variables"
+	"main/internal/utils/funcs"
+	"main/internal/utils/vars"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -17,11 +17,12 @@ func Login() *http.Client {
 		zap.L().Warn("Failed to create cookie jar")
 	}
 	client := &http.Client{Jar: cookieJar}
+	// TODO remove hardcoded links
 	_, err = client.Get("https://ezov.mzv.sk/e-zov/login.do")
 	if err != nil {
 		zap.L().Warn("Can't get login.do for cookies")
 	}
-	res, err := client.PostForm("https://ezov.mzv.sk/e-zov/j_spring_security_check", url.Values{"j_username": {variables.DefaultUserName}, "j_password": {variables.DefaultUserPassword}})
+	res, err := client.PostForm("https://ezov.mzv.sk/e-zov/j_spring_security_check", url.Values{"j_username": {vars.DefaultUserName}, "j_password": {vars.DefaultUserPassword}})
 	if err != nil {
 		zap.L().Warn("Can't post form to log in")
 	}
@@ -40,7 +41,7 @@ func Login() *http.Client {
 
 func CheckIsLoggedIn(client *http.Client) bool {
 	zap.L().Info("Started checking is user logged in")
-	res, err := soup.GetWithClient(variables.SiteUrl+"dateOfVisitDecision.do?siteLanguage=", client)
+	res, err := soup.GetWithClient(vars.SiteUrl+"dateOfVisitDecision.do?siteLanguage=", client)
 	if err != nil {
 		zap.L().Warn("Can't get dateOfVisitDecision.do?siteLanguage=")
 	}
@@ -50,5 +51,5 @@ func CheckIsLoggedIn(client *http.Client) bool {
 		zap.L().Warn("Element td doesnt exist on in the response")
 	}
 	zap.L().Info("Finished checking is user logged in")
-	return functions.StripString(td.Text()) == "There`s no reservation for this application."
+	return funcs.StripString(td.Text()) == "There`s no reservation for this application."
 }

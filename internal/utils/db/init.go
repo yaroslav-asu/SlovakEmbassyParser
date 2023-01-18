@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"main/internal/utils/variables"
+	"main/internal/utils/vars"
 	"main/models"
 )
 
 func Connect() *gorm.DB {
-	dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s", variables.DbUser, variables.DbPassword, variables.DbName)
+	dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s", vars.DbUser, vars.DbPassword, vars.DbName)
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")

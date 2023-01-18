@@ -1,4 +1,4 @@
-package variables
+package vars
 
 import (
 	"github.com/joho/godotenv"
@@ -17,7 +17,7 @@ var (
 )
 
 func InitDefaultEnv() {
-	zap.L().Info("Started to initialize environmental variables")
+	zap.L().Info("Started to initialize environmental vars")
 	err := godotenv.Load(".env")
 	if err != nil {
 		zap.L().Warn("Failed to load .env file")
@@ -25,12 +25,12 @@ func InitDefaultEnv() {
 	SiteUrl = os.Getenv("SITE_URL")
 	DefaultUserName = os.Getenv("DEFAULT_USER_NAME")
 	DefaultUserPassword = os.Getenv("DEFAULT_USER_PASSWORD")
-	zap.L().Info("Environmental variables successfully initialized")
+	zap.L().Info("Environmental vars successfully initialized")
 
 }
 
 func InitDbEnv() {
-	zap.L().Info("Started to initialize environmental variables for db")
+	zap.L().Info("Started to initialize environmental vars for db")
 	err := godotenv.Load("db.env")
 	if err != nil {
 		zap.L().Warn("Failed to load db.env file")

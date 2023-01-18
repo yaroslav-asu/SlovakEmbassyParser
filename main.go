@@ -1,16 +1,14 @@
 package main
 
 import (
-	"main/internal/login"
-	"main/internal/utils/db"
-	"main/internal/utils/init"
+	"fmt"
+	"main/internal/utils/funcs"
 	"main/parser"
 )
 
 func main() {
-	init.Init()
-	client := login.Login()
-	siteParser := parser.NewParser(client)
-	dataBase := db.Connect()
-	db.UpdateCities(dataBase, siteParser)
+	funcs.Init()
+	siteParser := parser.NewParser()
+	res, _ := siteParser.GetMonth(siteParser.WorkingCityByIndex(0), 1, 2023)
+	fmt.Println(res)
 }

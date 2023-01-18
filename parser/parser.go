@@ -2,19 +2,31 @@ package parser
 
 import (
 	"fmt"
+	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
+	"main/internal/login"
+	"main/internal/utils/db"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
 type Parser struct {
-	client *http.Client
+	session *http.Client
+	db      *gorm.DB
+	month   int
+	year    int
 }
 
-func NewParser(client *http.Client) Parser {
+func NewParser() Parser {
+	client := login.Login()
+	now := time.Now()
 	return Parser{
-		client: client,
+		session: client,
+		db:      db.Connect(),
+		month:   int(now.Month()),
+		year:    now.Year(),
 	}
 }
 
@@ -23,4 +35,8 @@ func (p Parser) RandomSleep() {
 	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%v", sleepingTime))
 	time.Sleep(time.Duration(sleepingTime) * time.Second)
 	zap.L().Info("Finished random sleeping")
+}
+
+func (p Parser) Get(link string) (string, error) {
+	return soup.GetWithClient(link, p.session)
 }
