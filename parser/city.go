@@ -3,7 +3,7 @@ package parser
 import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
-	"main/internal/utils/vars"
+	"main/internal/utils/funcs"
 	"main/models"
 	"strings"
 )
@@ -11,8 +11,7 @@ import (
 func (p Parser) GetEmbassyCities() []models.City {
 	zap.L().Info("Getting all cities with embassies")
 	p.RandomSleep()
-	// TODO make requests with parser.Get function
-	res, err := soup.GetWithClient(vars.SiteUrl+"consularPost.do", p.session)
+	res, err := p.Get(funcs.Linkefy("consularPost.do"))
 	if err != nil {
 		zap.L().Warn("Failed to connect to /consularPost.do page to get available cities")
 	}
@@ -34,7 +33,7 @@ func (p Parser) GetEmbassyCities() []models.City {
 func (p Parser) CheckEmbassyWork(city models.City) bool {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
 	p.RandomSleep()
-	res, err := soup.GetWithClient(vars.SiteUrl+"calendar.do?consularPost="+city.Id, p.session)
+	res, err := p.Get(funcs.Linkefy("calendar.do?consularPost=", city.Id))
 	if err != nil {
 		zap.L().Warn("Can't get embassy page of " + city.Name + " with id: " + city.Id)
 	}

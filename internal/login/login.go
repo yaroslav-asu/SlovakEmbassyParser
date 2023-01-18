@@ -17,16 +17,15 @@ func Login() *http.Client {
 		zap.L().Warn("Failed to create cookie jar")
 	}
 	client := &http.Client{Jar: cookieJar}
-	// TODO remove hardcoded links
-	_, err = client.Get("https://ezov.mzv.sk/e-zov/login.do")
+	_, err = client.Get(funcs.Linkefy("login.do"))
 	if err != nil {
 		zap.L().Warn("Can't get login.do for cookies")
 	}
-	res, err := client.PostForm("https://ezov.mzv.sk/e-zov/j_spring_security_check", url.Values{"j_username": {vars.DefaultUserName}, "j_password": {vars.DefaultUserPassword}})
+	res, err := client.PostForm(funcs.Linkefy("j_spring_security_check"), url.Values{"j_username": {vars.DefaultUserName}, "j_password": {vars.DefaultUserPassword}})
 	if err != nil {
 		zap.L().Warn("Can't post form to log in")
 	}
-	res, err = client.Get("https://ezov.mzv.sk/e-zov/dateOfVisitDecision.do?siteLanguage=")
+	res, err = client.Get(funcs.Linkefy("dateOfVisitDecision.do?siteLanguage="))
 	if err != nil {
 		zap.L().Warn("Can't get dateOfVisitDecision.do?siteLanguage=")
 	}
@@ -40,8 +39,9 @@ func Login() *http.Client {
 }
 
 func CheckIsLoggedIn(client *http.Client) bool {
+	// TODO: make checking equivalency with unlogged in text
 	zap.L().Info("Started checking is user logged in")
-	res, err := soup.GetWithClient(vars.SiteUrl+"dateOfVisitDecision.do?siteLanguage=", client)
+	res, err := soup.GetWithClient(funcs.Linkefy("dateOfVisitDecision.do?siteLanguage="), client)
 	if err != nil {
 		zap.L().Warn("Can't get dateOfVisitDecision.do?siteLanguage=")
 	}
