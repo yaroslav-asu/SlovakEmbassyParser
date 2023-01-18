@@ -1,18 +1,14 @@
 package main
 
 import (
-	"main/internal/logger"
 	"main/internal/login"
 	"main/internal/utils/db"
-	"main/internal/utils/random"
-	"main/internal/utils/variables"
+	"main/internal/utils/init"
 	"main/parser"
 )
 
 func main() {
-	variables.InitEnv()
-	logger.InitLogger()
-	random.InitRandom()
+	init.Init()
 	client := login.Login()
 	siteParser := parser.NewParser(client)
 	dataBase := db.Connect()
