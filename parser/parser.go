@@ -12,8 +12,8 @@ type Parser struct {
 	client *http.Client
 }
 
-func NewParser(client *http.Client) *Parser {
-	return &Parser{
+func NewParser(client *http.Client) Parser {
+	return Parser{
 		client: client,
 	}
 }
