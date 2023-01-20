@@ -4,6 +4,7 @@ import (
 	"main/internal/logger"
 	"main/internal/utils/random"
 	"main/internal/utils/vars"
+	"strconv"
 	"strings"
 )
 
@@ -49,4 +50,16 @@ func Linkefy(linkParts ...string) string {
 		link += strings.Replace(linkPart, "/", "", -1)
 	}
 	return link
+}
+
+func StringsToIntArray(stringArr []string) []int {
+	intArr := make([]int, len(stringArr))
+	for i, s := range stringArr {
+		intEl, err := strconv.Atoi(s)
+		if err != nil {
+
+		}
+		intArr[i] = intEl
+	}
+	return intArr
 }

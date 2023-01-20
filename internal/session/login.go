@@ -1,4 +1,4 @@
-package login
+package session
 
 import (
 	"github.com/anaskhan96/soup"
@@ -17,9 +17,9 @@ func Login() *http.Client {
 		zap.L().Warn("Failed to create cookie jar")
 	}
 	client := &http.Client{Jar: cookieJar}
-	_, err = client.Get(funcs.Linkefy("login.do"))
+	_, err = client.Get(funcs.Linkefy("session.do"))
 	if err != nil {
-		zap.L().Warn("Can't get login.do for cookies")
+		zap.L().Warn("Can't get session.do for cookies")
 	}
 	res, err := client.PostForm(funcs.Linkefy("j_spring_security_check"), url.Values{"j_username": {vars.DefaultUserName}, "j_password": {vars.DefaultUserPassword}})
 	if err != nil {
