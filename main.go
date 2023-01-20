@@ -12,6 +12,7 @@ import (
 func main() {
 	funcs.Init()
 	siteParser := parser.NewParser()
+	defer siteParser.Deconstruct()
 	session.Logout(siteParser.Session)
 	fmt.Println(siteParser.ParseMonth(models.City{Id: "601"}, 1, 2023))
 	res, _ := http.Get(funcs.Linkefy("calendar.do?month=0&consularPost=577"))

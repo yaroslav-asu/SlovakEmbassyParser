@@ -32,6 +32,11 @@ func NewParser() Parser {
 		Year:    now.Year(),
 	}
 }
+func (p *Parser) Deconstruct() {
+	zap.L().Info("Started parser deconstruction")
+	session.Logout(p.Session)
+	zap.L().Info("Finished parser deconstruction")
+}
 
 func (p *Parser) RandomSleep() {
 	sleepingTime := rand.Float64()*2 + 1
