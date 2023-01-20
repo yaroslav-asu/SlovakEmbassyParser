@@ -1,11 +1,15 @@
 package funcs
 
 import (
+	"fmt"
+	"go.uber.org/zap"
 	"main/internal/logger"
 	"main/internal/utils/random"
 	"main/internal/utils/vars"
+	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func StripString(s string) string {
@@ -39,9 +43,9 @@ func runeInList(checkingRune rune, runes []rune) bool {
 }
 
 func Init() {
+	vars.InitEnv()
 	random.InitRandom()
 	logger.InitLogger()
-	vars.InitEnv()
 }
 
 func Linkefy(linkParts ...string) string {
@@ -62,4 +66,10 @@ func StringsToIntArray(stringArr []string) []int {
 		intArr[i] = intEl
 	}
 	return intArr
+}
+func RandomSleep() {
+	sleepingTime := rand.Float64()*2 + 1
+	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%v", sleepingTime))
+	time.Sleep(time.Duration(sleepingTime) * time.Second)
+	zap.L().Info("Finished random sleeping")
 }

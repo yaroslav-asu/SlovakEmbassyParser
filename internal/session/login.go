@@ -30,7 +30,7 @@ func Login() *http.Client {
 		zap.L().Warn("Can't get dateOfVisitDecision.do?siteLanguage=")
 	}
 	if !CheckIsLoggedIn(client) {
-		zap.L().Warn("User logging in failed")
+		zap.L().Fatal("User logging in failed")
 	} else {
 		zap.L().Info("User successfully logged in user")
 	}
@@ -39,17 +39,22 @@ func Login() *http.Client {
 }
 
 func CheckIsLoggedIn(client *http.Client) bool {
-	// TODO: make checking equivalency with unlogged in text
 	zap.L().Info("Started checking is user logged in")
-	res, err := soup.GetWithClient(funcs.Linkefy("dateOfVisitDecision.do?siteLanguage="), client)
+	loggedRes, err := soup.GetWithClient(funcs.Linkefy("dateOfVisitDecision.do?siteLanguage="), client)
 	if err != nil {
-		zap.L().Warn("Can't get dateOfVisitDecision.do?siteLanguage=")
+		zap.L().Error("Got error while accessing to greeting page with session:\n" + err.Error())
 	}
-	doc := soup.HTMLParse(res)
-	td := doc.Find("td", "class", "infoTableInformationText")
-	if td.Error != nil {
-		zap.L().Warn("Element td doesnt exist on in the response")
+	loggedDoc := soup.HTMLParse(loggedRes)
+	loggedText := loggedDoc.Find("table", "class", "infoTable").FullText()
+	zap.L().Info("Got text with session")
+	funcs.RandomSleep()
+	unloggedRes, err := soup.Get(funcs.Linkefy("dateOfVisitDecision.do?siteLanguage="))
+	if err != nil {
+		zap.L().Error("Got error while accessing to greeting page without session:\n" + err.Error())
 	}
+	unloggedDoc := soup.HTMLParse(unloggedRes)
+	unloggedText := unloggedDoc.Find("table", "class", "infoTable").FullText()
+	zap.L().Info("Got text without session")
 	zap.L().Info("Finished checking is user logged in")
-	return funcs.StripString(td.Text()) == "There`s no reservation for this application."
+	return loggedText != unloggedText
 }

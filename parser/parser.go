@@ -1,14 +1,12 @@
 package parser
 
 import (
-	"fmt"
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"main/internal/session"
 	"main/internal/utils/db"
 	"main/internal/utils/funcs"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,10 +37,7 @@ func (p *Parser) Deconstruct() {
 }
 
 func (p *Parser) RandomSleep() {
-	sleepingTime := rand.Float64()*2 + 1
-	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%v", sleepingTime))
-	time.Sleep(time.Duration(sleepingTime) * time.Second)
-	zap.L().Info("Finished random sleeping")
+	funcs.RandomSleep()
 }
 
 func (p *Parser) Get(link string) (string, error) {

@@ -25,6 +25,7 @@ func InitDefaultEnv() {
 	SiteUrl = os.Getenv("SITE_URL")
 	DefaultUserName = os.Getenv("DEFAULT_USER_NAME")
 	DefaultUserPassword = os.Getenv("DEFAULT_USER_PASSWORD")
+	RunningMode = os.Getenv("RUNNING_MODE")
 	zap.L().Info("Environmental vars successfully initialized")
 
 }
