@@ -16,7 +16,7 @@ import (
 )
 
 type Parser struct {
-	session *http.Client
+	Session *http.Client
 	Db      *gorm.DB
 	Month   int
 	Year    int
@@ -26,7 +26,7 @@ func NewParser() Parser {
 	client := session.Login()
 	now := time.Now()
 	return Parser{
-		session: client,
+		Session: client,
 		Db:      db.Connect(),
 		Month:   int(now.Month()),
 		Year:    now.Year(),
@@ -41,7 +41,7 @@ func (p *Parser) RandomSleep() {
 }
 
 func (p *Parser) Get(link string) (string, error) {
-	return soup.GetWithClient(link, p.session)
+	return soup.GetWithClient(link, p.Session)
 }
 
 func ParseReservationData(data string) int {

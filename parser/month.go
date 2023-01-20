@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"main/internal/utils/funcs"
@@ -11,8 +10,6 @@ import (
 
 func (p *Parser) moveToMonth(city models.City, month int, year int) string {
 	zap.L().Info("Starting move to another month")
-	a := strconv.Itoa(month - p.Month + (year-p.Year)*12)
-	fmt.Println(a)
 	link := funcs.Linkefy("calendar.do?month=", strconv.Itoa(month-p.Month+(year-p.Year)*12), "&consularPost=", city.Id)
 	res, err := p.Get(link)
 	if err != nil {
