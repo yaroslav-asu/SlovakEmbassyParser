@@ -7,6 +7,7 @@ import (
 	"main/internal/session"
 	"main/internal/utils/db"
 	"main/internal/utils/funcs"
+	"main/models"
 	"net/http"
 	"strconv"
 	"strings"
@@ -65,4 +66,8 @@ func ParseMonthCellDate(date string, year int) time.Time {
 	intDate := funcs.StringsToIntArray(parsedDate)
 	day, month := intDate[0], intDate[1]
 	return time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+}
+
+func (p *Parser) SaveToDB(models models.DbModelArray) {
+	models.SaveToDb(p.Db)
 }
