@@ -61,7 +61,8 @@ func StringsToIntArray(stringArr []string) []int {
 	for i, s := range stringArr {
 		intEl, err := strconv.Atoi(s)
 		if err != nil {
-
+			zap.L().Error("Can't convert string to int: " + s)
+			return []int{}
 		}
 		intArr[i] = intEl
 	}

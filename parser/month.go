@@ -6,18 +6,19 @@ import (
 	"main/internal/utils/funcs"
 	"main/models"
 	"strconv"
+	"strings"
 	"time"
 )
 
 func (p *Parser) moveToMonth(city models.City, month int, year int) string {
 	zap.L().Info("Starting move to another month")
-	res, err := p.Get(funcs.Linkefy("calendar.do?month=", strconv.Itoa(month-p.Month+(year-p.Year)*12), "&consularPost=", city.Id))
+	res, err := p.GetSoup(funcs.Linkefy("calendar.do?month=", strconv.Itoa(month-p.Date.Month()+(year-p.Date.Year())*12), "&consularPost=", city.Id))
 	if err != nil {
 		zap.L().Warn("Failed move to month")
 		return ""
 	}
-	p.Month = month
-	p.Year = year
+	p.Date.ChangeMonth(month)
+	p.Date.ChangeYear(year)
 	zap.L().Info("Successfully moved to month")
 	return res
 }
@@ -41,9 +42,9 @@ func (p *Parser) GetDayCells(city models.City, month int, year int) []models.Day
 		if dateNode.Error != nil {
 			continue
 		}
-		dateText := funcs.StripString(dateNode.Text())
+		dateText := funcs.StripString(dateNode.Text()) + strconv.Itoa(p.Date.Year())
 		availableReservations := ParseReservationData(reservationData)
-		date := ParseMonthCellDate(dateText, p.Year)
+		date := models.ParseDateFromString(dateText)
 		dayCell := models.DayCell{
 			AvailableReservations: availableReservations,
 			CityId:                city.Id,
@@ -55,11 +56,29 @@ func (p *Parser) GetDayCells(city models.City, month int, year int) []models.Day
 	return dayCells
 }
 
+func ParseReservationData(data string) int {
+	for _, s := range []string{"[", "]"} {
+		data = strings.Replace(data, s, "", -1)
+	}
+	parsedNumbers := strings.Split(data, "/")
+	reservedNum, err := strconv.Atoi(parsedNumbers[0])
+	if err != nil {
+		zap.L().Error("Failed to parse count of reserved times")
+		return 0
+	}
+	totalNum, err := strconv.Atoi(parsedNumbers[1])
+	if err != nil {
+		zap.L().Error("Failed to parse amount of reservations")
+		return 0
+	}
+	return totalNum - reservedNum
+}
+
 func (p *Parser) ParseAvailableReservations(city models.City, date time.Time) models.AvailableReservations {
 	var availableReservations models.AvailableReservations
 	dateString := date.Format("02.01.2006")
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
-	res, err := p.Get(funcs.Linkefy("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
+	res, err := p.GetSoup(funcs.Linkefy("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
 	if err != nil {
 		zap.L().Warn("Got error, from getting date page of: " + dateString + " in " + city.Name + ":\n" + err.Error())
 	}

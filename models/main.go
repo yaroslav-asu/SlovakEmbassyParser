@@ -6,6 +6,6 @@ type DbModel interface {
 	FirstOrCreate(db *gorm.DB)
 }
 
-type DbModelArray interface {
+type SaveAble interface {
 	SaveToDb(db *gorm.DB)
 }

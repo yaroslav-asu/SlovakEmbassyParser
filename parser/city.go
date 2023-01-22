@@ -10,8 +10,8 @@ import (
 
 func (p *Parser) GetEmbassyCities() []models.City {
 	zap.L().Info("Getting all cities with embassies")
-	p.RandomSleep()
-	res, err := p.Get(funcs.Linkefy("consularPost.do"))
+	funcs.RandomSleep()
+	res, err := p.GetSoup(funcs.Linkefy("consularPost.do"))
 	if err != nil {
 		zap.L().Warn("Failed to connect to /consularPost.do page to get available cities")
 	}
@@ -32,8 +32,8 @@ func (p *Parser) GetEmbassyCities() []models.City {
 }
 func (p *Parser) CheckEmbassyWork(city models.City) bool {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
-	p.RandomSleep()
-	res, err := p.Get(funcs.Linkefy("calendar.do?consularPost=", city.Id))
+	funcs.RandomSleep()
+	res, err := p.GetSoup(funcs.Linkefy("calendar.do?consularPost=", city.Id))
 	if err != nil {
 		zap.L().Warn("Can't get embassy page of " + city.Name + " with id: " + city.Id)
 	}
