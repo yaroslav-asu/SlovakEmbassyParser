@@ -18,28 +18,26 @@ func StripString(s string) string {
 
 func stripStringRunes(s string, runes ...rune) string {
 	for i, letter := range s {
-		if !runeInList(letter, runes) {
+		if !isRuneInList(letter, runes) {
 			s = s[i:]
 			break
 		}
 	}
 	for i := len(s) - 1; i >= 0; i-- {
-		if !runeInList(rune(s[i]), runes) {
+		if !isRuneInList(rune(s[i]), runes) {
 			s = s[:i+1]
 			break
 		}
 	}
 	return s
 }
-func runeInList(checkingRune rune, runes []rune) bool {
-	fl := false
+func isRuneInList(checkingRune rune, runes []rune) bool {
 	for _, r := range runes {
 		if checkingRune == r {
-			fl = true
-			break
+			return true
 		}
 	}
-	return fl
+	return false
 }
 
 func Init() {
@@ -70,7 +68,7 @@ func StringsToIntArray(stringArr []string) []int {
 }
 func RandomSleep() {
 	sleepingTime := rand.Float64()*2 + 1
-	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%v", sleepingTime))
+	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 	time.Sleep(time.Duration(sleepingTime) * time.Second)
 	zap.L().Info("Finished random sleeping")
 }

@@ -32,7 +32,7 @@ func Login() *http.Client {
 	if !CheckIsLoggedIn(client) {
 		zap.L().Fatal("User logging in failed")
 	} else {
-		zap.L().Info("User successfully logged in user")
+		zap.L().Info("User successfully logged in")
 	}
 	defer res.Body.Close()
 	return client

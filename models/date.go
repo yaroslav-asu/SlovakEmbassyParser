@@ -1,21 +1,54 @@
 package models
 
 import (
+	"database/sql"
+	"database/sql/driver"
 	"go.uber.org/zap"
 	"main/internal/utils/funcs"
 	"strings"
 	"time"
 )
 
-type Date struct {
-	date time.Time
+type Date time.Time
+
+func (d *Date) Scan(value interface{}) (err error) {
+	nullTime := &sql.NullTime{}
+	err = nullTime.Scan(value)
+	*d = Date(nullTime.Time)
+	return
 }
 
-func NewDate(year int, month int, day int, hour int, minute int) Date {
-	return Date{
-		date: time.Date(year, time.Month(month), day, hour, minute, 0, 0, time.UTC),
-	}
+func (d *Date) Value() (driver.Value, error) {
+	year, month, date := time.Time(*d).Date()
+	return time.Date(year, month, date, 0, 0, 0, 0, time.UTC), nil
 }
+
+func (d *Date) GormDataType() string {
+	return "time"
+}
+
+func (d *Date) GobEncode() ([]byte, error) {
+	return time.Time(*d).GobEncode()
+}
+
+func (d *Date) GobDecode(b []byte) error {
+	return (*time.Time)(d).GobDecode(b)
+}
+
+func (d *Date) MarshalJSON() ([]byte, error) {
+	return time.Time(*d).MarshalJSON()
+}
+
+func (d *Date) UnmarshalJSON(b []byte) error {
+	return (*time.Time)(d).UnmarshalJSON(b)
+}
+func NewDateNow() Date {
+	return Date(time.Now())
+}
+func NewDate(year int, month int, day int, hour int, minute int) Date {
+	return Date(time.Date(year, time.Month(month), day, hour, minute, 0, 0, time.UTC))
+}
+
 func NewDateYMD(year int, month int, day int) Date {
 	return NewDate(year, month, day, 0, 0)
 }
@@ -28,53 +61,63 @@ func NewBlankDate() Date {
 	return NewDate(0, 0, 0, 0, 0)
 }
 
-func (d *Date) ChangeYear(year int) {
-	d.Change(d.Minutes(), d.Hour(), d.Day(), d.Month(), year)
-}
-
-func (d *Date) ChangeMonth(month int) {
-	d.Change(d.Minutes(), d.Hour(), d.Day(), month, d.Year())
-}
-
-func (d *Date) ChangeDay(day int) {
-	d.Change(d.Minutes(), d.Hour(), day, d.Month(), d.Year())
+func (d *Date) ChangeMinutes(minutes int) {
+	d.Change(minutes, d.Hour(), d.Day(), d.Month(), d.Year())
 }
 
 func (d *Date) ChangeHour(hour int) {
 	d.Change(d.Minutes(), hour, d.Day(), d.Month(), d.Year())
 }
 
-func (d *Date) ChangeMinutes(minutes int) {
-	d.Change(minutes, d.Hour(), d.Day(), d.Month(), d.Year())
+func (d *Date) ChangeDay(day int) {
+	d.Change(d.Minutes(), d.Hour(), day, d.Month(), d.Year())
+}
+
+func (d *Date) ChangeMonth(month int) {
+	d.Change(d.Minutes(), d.Hour(), d.Day(), month, d.Year())
+}
+
+func (d *Date) ChangeYear(year int) {
+	a := time.Time(*d)
+	d.Change(a.Minute(), d.Hour(), d.Day(), d.Month(), year)
 }
 
 func (d *Date) Change(minutes int, hour int, day int, month int, year int) {
-	d.date = time.Date(year, time.Month(month), day, hour, minutes, 0, 0, time.UTC)
+	*d = Date(time.Date(year, time.Month(month), day, hour, minutes, 0, 0, time.UTC))
 }
 
 func (d *Date) Minutes() int {
-	return d.date.Hour()
+	return time.Time(*d).Minute()
 }
+
 func (d *Date) Hour() int {
-	return d.date.Hour()
+	return time.Time(*d).Hour()
 }
 
 func (d *Date) Day() int {
-	return d.date.Day()
+	return time.Time(*d).Day()
 }
 
 func (d *Date) Month() int {
-	return int(d.date.Month())
+	return int(time.Time(*d).Month())
 }
 
 func (d *Date) Year() int {
-	return d.date.Year()
+	return time.Time(*d).Year()
+}
+
+func (d *Date) Time() time.Time {
+	return time.Time(*d)
+}
+
+func (d *Date) Format(format string) string {
+	return d.Time().Format(format)
 }
 
 func ParseDateFromString(dateString string) Date {
 	dateElements := strings.Split(dateString, ".")
 	if len(dateElements) != 3 {
-		zap.L().Error("Got unexpect string to parse month cell date: " + dateString)
+		zap.L().Error("Got unexpect string to parse month cell Date: " + dateString)
 		return NewBlankDate()
 	}
 	intDate := funcs.StringsToIntArray(dateElements)
