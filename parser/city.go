@@ -8,10 +8,10 @@ import (
 	"strings"
 )
 
-func (p *Parser) GetEmbassyCities() []models.City {
+func (p *Parser) GetWorkingCities() []models.City {
 	zap.L().Info("Getting all cities with embassies")
 	funcs.RandomSleep()
-	res, err := p.GetSoup(funcs.Linkefy("consularPost.do"))
+	res, err := p.GetSoup(funcs.Linkify("consularPost.do"))
 	if err != nil {
 		zap.L().Warn("Failed to connect to /consularPost.do page to get available cities")
 	}
@@ -33,7 +33,7 @@ func (p *Parser) GetEmbassyCities() []models.City {
 func (p *Parser) CheckEmbassyWork(city models.City) bool {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
 	funcs.RandomSleep()
-	res, err := p.GetSoup(funcs.Linkefy("calendar.do?consularPost=", city.Id))
+	res, err := p.GetSoup(funcs.Linkify("calendar.do?consularPost=", city.Id))
 	if err != nil {
 		zap.L().Warn("Can't get embassy page of " + city.Name + " with id: " + city.Id)
 	}
@@ -47,9 +47,9 @@ func (p *Parser) CheckEmbassyWork(city models.City) bool {
 	return true
 }
 
-func (p *Parser) UpdateCities() {
+func (p *Parser) UpdateWorkingCities() {
 	zap.L().Info("Started updating topicalCities with embassies in Db")
-	topicalCities := p.GetEmbassyCities()
+	topicalCities := p.GetWorkingCities()
 	zap.L().Info("Successfully got topicalCities with embassies")
 	for _, city := range topicalCities {
 		zap.L().Info("Trying to find or creating city with name: " + city.Name + " and id: " + city.Id + " in Db")
@@ -81,7 +81,7 @@ func (p *Parser) DeleteOutdatedCities(topicalCities []models.City) {
 		}
 	}
 }
-func (p *Parser) WorkingCityByIndex(index int) models.City {
+func (p *Parser) GetWorkingCity(index int) models.City {
 	var workingCities []models.City
 	p.Db.Where("working = ?", true).Find(&workingCities)
 	return workingCities[index]

@@ -18,7 +18,7 @@ type Parser struct {
 }
 
 func NewParser() Parser {
-	client := session.Login()
+	client := session.LogIn()
 	now := time.Now()
 	return Parser{
 		Session: client,
@@ -28,7 +28,7 @@ func NewParser() Parser {
 }
 func (p *Parser) Deconstruct() {
 	zap.L().Info("Started parser deconstruction")
-	session.Logout(p.Session)
+	session.LogOut(p.Session)
 	zap.L().Info("Finished parser deconstruction")
 }
 

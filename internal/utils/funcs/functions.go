@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"main/internal/logger"
-	"main/internal/utils/random"
 	"main/internal/utils/vars"
 	"math/rand"
 	"strconv"
@@ -42,11 +41,10 @@ func isRuneInList(checkingRune rune, runes []rune) bool {
 
 func Init() {
 	vars.InitEnv()
-	random.InitRandom()
 	logger.InitLogger()
 }
 
-func Linkefy(linkParts ...string) string {
+func Linkify(linkParts ...string) string {
 	link := vars.SiteUrl
 	for _, linkPart := range linkParts {
 		link += strings.Replace(linkPart, "/", "", -1)

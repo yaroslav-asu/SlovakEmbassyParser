@@ -11,6 +11,7 @@ import (
 
 type Date time.Time
 
+// Scan implementation for Gorm
 func (d *Date) Scan(value interface{}) (err error) {
 	nullTime := &sql.NullTime{}
 	err = nullTime.Scan(value)
@@ -18,6 +19,7 @@ func (d *Date) Scan(value interface{}) (err error) {
 	return
 }
 
+// Value implementation for Gorm
 func (d *Date) Value() (driver.Value, error) {
 	year, month, date := time.Time(*d).Date()
 	return time.Date(year, month, date, 0, 0, 0, 0, time.UTC), nil
@@ -62,31 +64,31 @@ func NewBlankDate() Date {
 }
 
 func (d *Date) ChangeMinutes(minutes int) {
-	d.Change(minutes, d.Hour(), d.Day(), d.Month(), d.Year())
+	d.Set(minutes, d.Hour(), d.Day(), d.Month(), d.Year())
 }
 
-func (d *Date) ChangeHour(hour int) {
-	d.Change(d.Minutes(), hour, d.Day(), d.Month(), d.Year())
+func (d *Date) SetHour(hour int) {
+	d.Set(d.Minute(), hour, d.Day(), d.Month(), d.Year())
 }
 
-func (d *Date) ChangeDay(day int) {
-	d.Change(d.Minutes(), d.Hour(), day, d.Month(), d.Year())
+func (d *Date) SetDay(day int) {
+	d.Set(d.Minute(), d.Hour(), day, d.Month(), d.Year())
 }
 
-func (d *Date) ChangeMonth(month int) {
-	d.Change(d.Minutes(), d.Hour(), d.Day(), month, d.Year())
+func (d *Date) SetMonth(month int) {
+	d.Set(d.Minute(), d.Hour(), d.Day(), month, d.Year())
 }
 
-func (d *Date) ChangeYear(year int) {
+func (d *Date) SetYear(year int) {
 	a := time.Time(*d)
-	d.Change(a.Minute(), d.Hour(), d.Day(), d.Month(), year)
+	d.Set(a.Minute(), d.Hour(), d.Day(), d.Month(), year)
 }
 
-func (d *Date) Change(minutes int, hour int, day int, month int, year int) {
+func (d *Date) Set(minutes int, hour int, day int, month int, year int) {
 	*d = Date(time.Date(year, time.Month(month), day, hour, minutes, 0, 0, time.UTC))
 }
 
-func (d *Date) Minutes() int {
+func (d *Date) Minute() int {
 	return time.Time(*d).Minute()
 }
 
