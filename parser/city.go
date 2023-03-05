@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func (p *Parser) GetWorkingCities() []models.City {
+func (p *Parser) GetCitiesWithWorkingEmbassies() []models.City {
 	zap.L().Info("Getting all cities with embassies")
 	funcs.RandomSleep()
 	res, err := p.GetSoup(funcs.Linkify("consularPost.do"))
@@ -47,14 +47,14 @@ func (p *Parser) CheckEmbassyWork(city models.City) bool {
 	return true
 }
 
-func (p *Parser) UpdateWorkingCities() {
+func (p *Parser) UpdateCitiesWithWorkingEmbassies() {
 	zap.L().Info("Started updating topicalCities with embassies in Db")
-	topicalCities := p.GetWorkingCities()
+	topicalCities := p.GetCitiesWithWorkingEmbassies()
 	zap.L().Info("Successfully got topicalCities with embassies")
 	for _, city := range topicalCities {
 		zap.L().Info("Trying to find or creating city with name: " + city.Name + " and id: " + city.Id + " in Db")
 		cityCopy := city
-		// TODO fix error: when city soft deleted from Db, gorm tries to create new one and getting error
+		// TODO fix error: when city soft deleted from Db, gorm tries to create new one and gets error
 		record := p.Db.FirstOrCreate(&cityCopy)
 		if record.RowsAffected == 0 {
 			zap.L().Info("City with name:" + city.Name + " and id: " + city.Id + " in Db doesn't match with current, updating")
@@ -81,7 +81,7 @@ func (p *Parser) DeleteOutdatedCities(topicalCities []models.City) {
 		}
 	}
 }
-func (p *Parser) GetWorkingCity(index int) models.City {
+func (p *Parser) GetCityWithWorkingEmbassy(index int) models.City {
 	var workingCities []models.City
 	p.Db.Where("working = ?", true).Find(&workingCities)
 	return workingCities[index]

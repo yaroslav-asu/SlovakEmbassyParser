@@ -28,7 +28,7 @@ func (p *Parser) GetMonthSoup(city models.City, month int, year int) string {
 	return p.moveToMonth(city, month, year)
 }
 
-func (p *Parser) GetMonthWorkingDays(city models.City, month int, year int) []models.DayCell {
+func (p *Parser) GetWorkingDaysInMonth(city models.City, month int, year int) []models.DayCell {
 	zap.L().Info("Started to get day cells")
 	var dayCells []models.DayCell
 	res := p.GetMonthSoup(city, month, year)
@@ -43,7 +43,7 @@ func (p *Parser) GetMonthWorkingDays(city models.City, month int, year int) []mo
 			continue
 		}
 		dateText := funcs.StripString(dateNode.Text()) + strconv.Itoa(p.Date.Year())
-		availableReservations := ParseAvailableReservationData(reservationData)
+		availableReservations := ParseAvailableReservationCount(reservationData)
 		date := models.ParseDateFromString(dateText)
 		dayCell := models.DayCell{
 			AvailableReservations: availableReservations,
@@ -56,7 +56,7 @@ func (p *Parser) GetMonthWorkingDays(city models.City, month int, year int) []mo
 	return dayCells
 }
 
-func ParseAvailableReservationData(data string) int {
+func ParseAvailableReservationCount(data string) int {
 	for _, s := range []string{"[", "]"} {
 		data = strings.Replace(data, s, "", -1)
 	}

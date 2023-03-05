@@ -17,3 +17,9 @@ func (a AvailableReservation) SaveToDb(db *gorm.DB) {
 }
 
 type AvailableReservations []DbModel
+
+func (a AvailableReservations) SaveToDb(db *gorm.DB) {
+	for reservationId := range a {
+		a[reservationId].SaveToDb(db)
+	}
+}
