@@ -36,6 +36,6 @@ func (p *Parser) GetSoup(link string) (string, error) {
 	return soup.GetWithClient(link, p.Session)
 }
 
-func (p *Parser) SaveToDB(models models.SaveAble) {
-	models.SaveToDb(p.Db)
+func (p *Parser) SaveToDB(DatabaseModel models.DbModel) {
+	DatabaseModel.SaveToDb(p.Db)
 }

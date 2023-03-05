@@ -74,7 +74,7 @@ func ParseReservationData(data string) int {
 	return totalNum - reservedNum
 }
 
-func (p *Parser) ParseAvailableReservations(city models.City, date models.Date) models.AvailableReservations {
+func (p *Parser) ParseDay(city models.City, date models.Date) models.AvailableReservations {
 	var availableReservations models.AvailableReservations
 	dateString := date.Format("02.01.2006")
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
@@ -104,7 +104,7 @@ func (p *Parser) ParseAvailableReservations(city models.City, date models.Date) 
 			CityId: city.Id,
 			Date:   date,
 		}
-		availableReservations.Reservations = append(availableReservations.Reservations, availableReservation)
+		availableReservations = append(availableReservations, availableReservation)
 	}
 	zap.L().Info("Finished parsing available reservations of: " + dateString + " in " + city.Name)
 	return availableReservations
