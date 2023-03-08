@@ -6,6 +6,7 @@ import (
 )
 
 type AvailableReservation struct {
+	Id     uint `gorm:"primaryKey"`
 	CityId string
 	Date   Date
 }

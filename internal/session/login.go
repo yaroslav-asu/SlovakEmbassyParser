@@ -47,7 +47,7 @@ func IsLoggedIn(client *http.Client) bool {
 	loggedInDoc := soup.HTMLParse(loggedInRes)
 	loggedText := loggedInDoc.Find("table", "class", "infoTable").FullText()
 	zap.L().Info("Got text with session")
-	funcs.RandomSleep()
+	funcs.Sleep()
 	loggedOutRes, err := soup.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
 	if err != nil {
 		zap.L().Error("Got error while accessing to greeting page without session:\n" + err.Error())

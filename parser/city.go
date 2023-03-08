@@ -11,7 +11,7 @@ import (
 
 func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 	zap.L().Info("Getting all cities with embassies")
-	funcs.RandomSleep()
+	funcs.Sleep()
 	res, err := p.getSoup(funcs.Linkify("consularPost.do"))
 	if err != nil {
 		zap.L().Warn("Failed to connect to /consularPost.do page to get available cities")
@@ -30,9 +30,9 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 		}
 		city.StartWorking, city.EndWorking = p.GetEmbassyWorkingMonths(city)
 		if city.StartWorking != models.NewBlankDate() {
-			p.SaveToDb(city)
+			p.SaveToDB(city)
 		} else {
-			p.DeleteFromDb(city)
+			p.DeleteFromDB(city)
 		}
 
 	}
@@ -40,7 +40,7 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 }
 func (p *Parser) isEmbassyWorksInMonth(city models.City, date models.Date) string {
 	zap.L().Info("Checking does: " + city.Name + " with id: " + city.Id + " work in: " + date.Format(models.MonthAndYear))
-	funcs.LongRandomSleep()
+	funcs.SleepTime(15, 20)
 	doc := p.GetMonthSoup(city, date)
 	dayCells := doc.FindAll("td", "class", "calendarMonthCell")
 	if len(dayCells) == 0 {
@@ -57,7 +57,7 @@ func (p *Parser) isEmbassyWorksInMonth(city models.City, date models.Date) strin
 
 func (p *Parser) GetEmbassyWorkingMonths(city models.City) (models.Date, models.Date) {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
-	funcs.LongRandomSleep()
+	funcs.SleepTime(15, 20)
 	now := models.NewDateNow()
 	checkingDate := models.NewDateYM(now.Year(), now.Month())
 	start := models.NewBlankDate()
@@ -79,7 +79,7 @@ func (p *Parser) GetEmbassyWorkingMonths(city models.City) (models.Date, models.
 
 func (p *Parser) CheckEmbassyWork(city models.City) string {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
-	funcs.RandomSleep()
+	funcs.Sleep()
 	doc := p.getParsedSoup(funcs.Linkify("calendar.do?consularPost=", city.Id))
 	monthCell := doc.Find("td", "class", "calendarMonthCell")
 	if monthCell.Error != nil {

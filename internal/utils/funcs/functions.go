@@ -64,14 +64,12 @@ func StringsToIntArray(stringArr []string) []int {
 	}
 	return intArr
 }
-func RandomSleep() {
-	sleepingTime := rand.Float64()*2 + 1
-	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
-	time.Sleep(time.Duration(sleepingTime) * time.Second)
-	zap.L().Info("Finished random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
+func Sleep() {
+	SleepTime(2, 5)
 }
-func LongRandomSleep() {
-	sleepingTime := rand.Float64()*15 + 15
+
+func SleepTime(from, to float64) {
+	sleepingTime := rand.Float64()*(to-from) + from
 	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 	time.Sleep(time.Duration(sleepingTime) * time.Second)
 	zap.L().Info("Finished random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))

@@ -45,10 +45,10 @@ func (p *Parser) getParsedSoup(link string) soup.Root {
 	return soup.HTMLParse(doc)
 }
 
-func (p *Parser) SaveToDb(model models.DbModel) {
+func (p *Parser) SaveToDB(model models.DbModel) {
 	model.SaveToDB(p.Db)
 }
 
-func (p *Parser) DeleteFromDb(model models.DbModel) {
+func (p *Parser) DeleteFromDB(model models.DbModel) {
 	model.DeleteFromDB(p.Db)
 }
