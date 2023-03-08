@@ -32,9 +32,9 @@ func InitDefaultEnv() {
 
 func InitDbEnv() {
 	zap.L().Info("Started to initialize environmental vars for db")
-	err := godotenv.Load("db.env")
+	err := godotenv.Load(".env.db")
 	if err != nil {
-		zap.L().Warn("Failed to load db.env file")
+		zap.L().Warn("Failed to load .env.db file")
 	}
 	DbUser = os.Getenv("POSTGRES_USER")
 	DbPassword = os.Getenv("POSTGRES_PASSWORD")

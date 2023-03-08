@@ -32,10 +32,23 @@ func (p *Parser) Deconstruct() {
 	zap.L().Info("Finished parser deconstruction")
 }
 
-func (p *Parser) GetSoup(link string) (string, error) {
+func (p *Parser) getSoup(link string) (string, error) {
 	return soup.GetWithClient(link, p.Session)
 }
 
-func (p *Parser) SaveToDB(DatabaseModel models.DbModel) {
-	DatabaseModel.SaveToDb(p.Db)
+func (p *Parser) getParsedSoup(link string) soup.Root {
+	doc, err := p.getSoup(link)
+	if err != nil {
+		zap.L().Error("Cant get: " + link)
+		return soup.Root{}
+	}
+	return soup.HTMLParse(doc)
+}
+
+func (p *Parser) SaveToDb(model models.DbModel) {
+	model.SaveToDB(p.Db)
+}
+
+func (p *Parser) DeleteFromDb(model models.DbModel) {
+	model.DeleteFromDB(p.Db)
 }

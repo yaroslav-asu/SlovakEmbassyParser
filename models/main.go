@@ -3,5 +3,6 @@ package models
 import "gorm.io/gorm"
 
 type DbModel interface {
-	SaveToDb(db *gorm.DB)
+	SaveToDB(db *gorm.DB)
+	DeleteFromDB(db *gorm.DB)
 }

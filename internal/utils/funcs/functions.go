@@ -68,5 +68,11 @@ func RandomSleep() {
 	sleepingTime := rand.Float64()*2 + 1
 	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 	time.Sleep(time.Duration(sleepingTime) * time.Second)
-	zap.L().Info("Finished random sleeping")
+	zap.L().Info("Finished random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
+}
+func LongRandomSleep() {
+	sleepingTime := rand.Float64()*15 + 15
+	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
+	time.Sleep(time.Duration(sleepingTime) * time.Second)
+	zap.L().Info("Finished random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 }

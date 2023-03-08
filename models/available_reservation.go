@@ -6,20 +6,23 @@ import (
 )
 
 type AvailableReservation struct {
-	gorm.Model
-	Date   Date
 	CityId string
+	Date   Date
 }
 
-func (a AvailableReservation) SaveToDb(db *gorm.DB) {
+func (a AvailableReservation) SaveToDB(db *gorm.DB) {
 	zap.L().Info("Saved to DB")
 	db.FirstOrCreate(&a, a)
 }
 
+func (a AvailableReservation) DeleteFromDB(db *gorm.DB) {
+	db.Where("date = ? and id = ?", a.Date, a.CityId).Delete(&a)
+}
+
 type AvailableReservations []DbModel
 
-func (a AvailableReservations) SaveToDb(db *gorm.DB) {
+func (a AvailableReservations) SaveToDB(db *gorm.DB) {
 	for reservationId := range a {
-		a[reservationId].SaveToDb(db)
+		a[reservationId].SaveToDB(db)
 	}
 }

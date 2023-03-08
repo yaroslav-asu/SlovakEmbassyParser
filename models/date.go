@@ -11,6 +11,8 @@ import (
 
 type Date time.Time
 
+var MonthAndYear = "01.2006"
+
 // Scan implementation for Gorm
 func (d *Date) Scan(value interface{}) (err error) {
 	nullTime := &sql.NullTime{}
@@ -44,9 +46,11 @@ func (d *Date) MarshalJSON() ([]byte, error) {
 func (d *Date) UnmarshalJSON(b []byte) error {
 	return (*time.Time)(d).UnmarshalJSON(b)
 }
+
 func NewDateNow() Date {
 	return Date(time.Now())
 }
+
 func NewDate(year int, month int, day int, hour int, minute int) Date {
 	return Date(time.Date(year, time.Month(month), day, hour, minute, 0, 0, time.UTC))
 }
@@ -56,11 +60,11 @@ func NewDateYMD(year int, month int, day int) Date {
 }
 
 func NewDateYM(year int, month int) Date {
-	return NewDate(year, month, 0, 0, 0)
+	return NewDate(year, month, 1, 0, 0)
 }
 
 func NewBlankDate() Date {
-	return NewDate(0, 0, 0, 0, 0)
+	return NewDate(1, 1, 1, 0, 0)
 }
 
 func (d *Date) ChangeMinutes(minutes int) {
@@ -75,8 +79,12 @@ func (d *Date) SetDay(day int) {
 	d.Set(d.Minute(), d.Hour(), day, d.Month(), d.Year())
 }
 
-func (d *Date) SetMonth(month int) {
-	d.Set(d.Minute(), d.Hour(), d.Day(), month, d.Year())
+func (d *Date) SetMonth(month int) Date {
+	return d.Set(d.Minute(), d.Hour(), d.Day(), month, d.Year())
+}
+
+func (d *Date) MoveMonth(delta int) Date {
+	return d.SetMonth(d.Month() + delta)
 }
 
 func (d *Date) SetYear(year int) {
@@ -84,8 +92,9 @@ func (d *Date) SetYear(year int) {
 	d.Set(a.Minute(), d.Hour(), d.Day(), d.Month(), year)
 }
 
-func (d *Date) Set(minutes int, hour int, day int, month int, year int) {
+func (d *Date) Set(minutes int, hour int, day int, month int, year int) Date {
 	*d = Date(time.Date(year, time.Month(month), day, hour, minutes, 0, 0, time.UTC))
+	return *d
 }
 
 func (d *Date) Minute() int {
