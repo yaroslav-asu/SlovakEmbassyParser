@@ -11,7 +11,10 @@ import (
 
 type Date time.Time
 
-var MonthAndYear = "01.2006"
+var (
+	MonthAndYear = "01.2006"
+	BasicDate    = "02.01.2006"
+)
 
 // Scan implementation for Gorm
 func (d *Date) Scan(value interface{}) (err error) {
