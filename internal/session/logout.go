@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func Logout(client *http.Client) {
-	res, err := client.Get(funcs.Linkefy("j_spring_security_logout"))
+func LogOut(client *http.Client) {
+	res, err := client.Get(funcs.Linkify("j_spring_security_logout"))
 	if err != nil {
 		zap.L().Warn("Cant get logout page")
 	}
@@ -15,6 +15,6 @@ func Logout(client *http.Client) {
 	case 200:
 		zap.L().Info("Successfully logged out")
 	default:
-		zap.L().Warn("On logout got error code: " + res.Status)
+		zap.L().Warn("On logout got error with code: " + res.Status)
 	}
 }

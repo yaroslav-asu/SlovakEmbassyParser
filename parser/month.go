@@ -8,29 +8,26 @@ import (
 	"strconv"
 )
 
-func (p *Parser) moveToMonth(city models.City, month int, year int) string {
-	zap.L().Info("Starting move to another month")
-	link := funcs.Linkefy("calendar.do?month=", strconv.Itoa(month-p.Month+(year-p.Year)*12), "&consularPost=", city.Id)
-	res, err := p.Get(link)
-	if err != nil {
-		zap.L().Warn("Failed move to month")
-		return ""
-	}
-	p.Month = month
-	p.Year = year
-	zap.L().Info("Successfully moved to month")
+func (p *Parser) moveToMonth(city models.City, date models.Date) soup.Root {
+	zap.L().Info("Starting move to month: " + date.Format(models.MonthAndYear))
+	res := p.getParsedSoup(funcs.Linkify("calendar.do?month=", strconv.Itoa(date.Month()-p.Date.Month()+(date.Year()-p.Date.Year())*12), "&consularPost=", city.Id))
+	p.Date.SetMonth(date.Month())
+	p.Date.SetYear(date.Year())
+	zap.L().Info("Successfully moved to " + date.Format(models.MonthAndYear))
 	return res
 }
 
-func (p *Parser) GetMonth(city models.City, month int, year int) string {
+func (p *Parser) GetMonthSoup(city models.City, date models.Date) soup.Root {
 	zap.L().Info("Starting getting month")
-	return p.moveToMonth(city, month, year)
+	return p.moveToMonth(city, date)
 }
 
-func (p *Parser) ParseMonth(city models.City, month int, year int) []models.DayCell {
+func (p *Parser) GetWorkingDaysInMonth(city models.City, date models.Date) []models.DayCell {
+	zap.L().Info("Started to get day cells")
+	funcs.Sleep()
 	var dayCells []models.DayCell
-	res := p.GetMonth(city, month, year)
-	monthCell := soup.HTMLParse(res).FindAll("td", "class", "calendarMonthCell")
+	res := p.GetMonthSoup(city, date)
+	monthCell := res.FindAll("td", "class", "calendarMonthCell")
 	for _, el := range monthCell {
 		freeSpaceNode := el.Find("font")
 		if freeSpaceNode.Error != nil {
@@ -40,14 +37,16 @@ func (p *Parser) ParseMonth(city models.City, month int, year int) []models.DayC
 		if dateNode.Error != nil {
 			continue
 		}
-		dateText := funcs.StripString(dateNode.Text())
-		availableReservations := ParseReservationData(reservationData)
-		date := ParseMonthCellDate(dateText, p.Year)
+		dateText := funcs.StripString(dateNode.Text()) + strconv.Itoa(date.Year())
+		availableReservations := AvailableReservationsInDay(reservationData)
+		date := models.ParseDateFromString(dateText)
 		dayCell := models.DayCell{
 			AvailableReservations: availableReservations,
+			CityId:                city.Id,
 			Date:                  date,
 		}
 		dayCells = append(dayCells, dayCell)
 	}
+	zap.L().Info("Finished to get day cells")
 	return dayCells
 }

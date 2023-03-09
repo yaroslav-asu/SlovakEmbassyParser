@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"main/internal/logger"
-	"main/internal/utils/random"
 	"main/internal/utils/vars"
 	"math/rand"
 	"strconv"
@@ -18,37 +17,34 @@ func StripString(s string) string {
 
 func stripStringRunes(s string, runes ...rune) string {
 	for i, letter := range s {
-		if !runeInList(letter, runes) {
+		if !isRuneInList(letter, runes) {
 			s = s[i:]
 			break
 		}
 	}
 	for i := len(s) - 1; i >= 0; i-- {
-		if !runeInList(rune(s[i]), runes) {
+		if !isRuneInList(rune(s[i]), runes) {
 			s = s[:i+1]
 			break
 		}
 	}
 	return s
 }
-func runeInList(checkingRune rune, runes []rune) bool {
-	fl := false
+func isRuneInList(checkingRune rune, runes []rune) bool {
 	for _, r := range runes {
 		if checkingRune == r {
-			fl = true
-			break
+			return true
 		}
 	}
-	return fl
+	return false
 }
 
 func Init() {
 	vars.InitEnv()
-	random.InitRandom()
 	logger.InitLogger()
 }
 
-func Linkefy(linkParts ...string) string {
+func Linkify(linkParts ...string) string {
 	link := vars.SiteUrl
 	for _, linkPart := range linkParts {
 		link += strings.Replace(linkPart, "/", "", -1)
@@ -61,15 +57,20 @@ func StringsToIntArray(stringArr []string) []int {
 	for i, s := range stringArr {
 		intEl, err := strconv.Atoi(s)
 		if err != nil {
-
+			zap.L().Error("Can't convert string to int: " + s)
+			return []int{}
 		}
 		intArr[i] = intEl
 	}
 	return intArr
 }
-func RandomSleep() {
-	sleepingTime := rand.Float64()*2 + 1
-	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%v", sleepingTime))
+func Sleep() {
+	SleepTime(2, 5)
+}
+
+func SleepTime(from, to float64) {
+	sleepingTime := rand.Float64()*(to-from) + from
+	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 	time.Sleep(time.Duration(sleepingTime) * time.Second)
-	zap.L().Info("Finished random sleeping")
+	zap.L().Info("Finished random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 }

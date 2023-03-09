@@ -1,8 +1,10 @@
 package models
 
-import "time"
+import "gorm.io/gorm"
 
 type DayCell struct {
 	AvailableReservations int
-	Date                  time.Time
+	CityId                string
+	Date                  Date
+	gorm.Model
 }
