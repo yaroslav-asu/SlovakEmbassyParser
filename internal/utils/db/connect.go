@@ -6,7 +6,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"main/internal/utils/vars"
-	"main/models"
+	gorm_models "main/models/gorm"
 )
 
 func Connect() *gorm.DB {
@@ -15,7 +15,7 @@ func Connect() *gorm.DB {
 	if err != nil {
 		zap.L().Fatal("failed to connect database")
 	}
-	err = db.AutoMigrate(&models.Reservation{}, &models.City{})
+	err = db.AutoMigrate(&gorm_models.Reservation{}, &gorm_models.City{})
 	if err != nil {
 		zap.L().Fatal("failed to auto migrate database")
 	}

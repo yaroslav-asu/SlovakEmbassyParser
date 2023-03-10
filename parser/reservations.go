@@ -3,8 +3,9 @@ package parser
 import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
+	"main/internal/datetime"
 	"main/internal/utils/funcs"
-	"main/models"
+	"main/models/gorm"
 	"strconv"
 	"strings"
 	"time"
@@ -28,14 +29,14 @@ func AvailableReservationsInDay(data string) int {
 	return totalNum - reservedNum
 }
 
-func (p *Parser) GetReservations(city models.City, date models.Date) (models.Reservations, models.Reservations) {
+func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reservations, gorm.Reservations) {
 	funcs.Sleep()
-	var availableReservations, unavailableReservations models.Reservations
-	dateString := date.Format(models.BasicDate)
+	var availableReservations, unavailableReservations gorm.Reservations
+	dateString := date.Format(datetime.BasicDate)
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
 	res, err := p.getSoup(funcs.Linkify("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
 	if err != nil {
-		zap.L().Warn("Got error, from getting date page of: " + dateString + " in " + city.Name + ":\n" + err.Error())
+		zap.L().Warn("Got error, from getting datetime page of: " + dateString + " in " + city.Name + ":\n" + err.Error())
 	}
 	doc := soup.HTMLParse(res)
 	trs := doc.FindAll("tr")
@@ -56,7 +57,7 @@ func (p *Parser) GetReservations(city models.City, date models.Date) (models.Res
 		}
 		date.SetHour(parsedTime.Hour())
 		date.ChangeMinutes(parsedTime.Minute())
-		reservation := models.Reservation{
+		reservation := gorm.Reservation{
 			CityId: city.Id,
 			Date:   date,
 		}
@@ -70,7 +71,7 @@ func (p *Parser) GetReservations(city models.City, date models.Date) (models.Res
 	return availableReservations, unavailableReservations
 }
 
-func (p *Parser) ParseMonthReservations(city models.City, date models.Date) {
+func (p *Parser) ParseMonthReservations(city gorm.City, date datetime.Date) {
 	workingDays := p.GetWorkingDaysInMonth(city, date)
 	for i := range workingDays {
 		availableReservations, unavailableReservations := p.GetReservations(city, workingDays[i].Date)

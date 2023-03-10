@@ -1,4 +1,4 @@
-package models
+package datetime
 
 import (
 	"database/sql"

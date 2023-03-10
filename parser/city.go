@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
+	"main/internal/datetime"
 	"main/internal/utils/funcs"
-	"main/models"
+	gorm_models "main/models/gorm"
 	"strings"
 )
 
@@ -21,7 +22,7 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 		fmt.Println(el.Text())
 	}
 	for _, el := range doc.FindAll("option") {
-		city := models.City{
+		city := gorm_models.City{
 			Id:   el.Attrs()["value"],
 			Name: el.Text(),
 		}
@@ -29,7 +30,7 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 			continue
 		}
 		city.StartWorking, city.EndWorking = p.GetEmbassyWorkingMonths(city)
-		if city.StartWorking != models.NewBlankDate() {
+		if city.StartWorking != datetime.NewBlankDate() {
 			p.SaveToDB(city)
 		} else {
 			p.DeleteFromDB(city)
@@ -38,13 +39,13 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 	}
 	zap.L().Info("Successfully got all cities with embassies")
 }
-func (p *Parser) isEmbassyWorksInMonth(city models.City, date models.Date) string {
-	zap.L().Info("Checking does: " + city.Name + " with id: " + city.Id + " work in: " + date.Format(models.MonthAndYear))
+func (p *Parser) isEmbassyWorksInMonth(city gorm_models.City, date datetime.Date) string {
+	zap.L().Info("Checking does: " + city.Name + " with id: " + city.Id + " work in: " + date.Format(datetime.MonthAndYear))
 	funcs.SleepTime(15, 20)
 	doc := p.GetMonthSoup(city, date)
 	dayCells := doc.FindAll("td", "class", "calendarMonthCell")
 	if len(dayCells) == 0 {
-		zap.L().Info("Embassy in " + city.Name + " with id: " + city.Id + " at: " + date.Format(models.MonthAndYear) + " doesn't work")
+		zap.L().Info("Embassy in " + city.Name + " with id: " + city.Id + " at: " + date.Format(datetime.MonthAndYear) + " doesn't work")
 		return "no"
 	}
 	for dayCell := range dayCells {
@@ -55,17 +56,17 @@ func (p *Parser) isEmbassyWorksInMonth(city models.City, date models.Date) strin
 	return "currently no"
 }
 
-func (p *Parser) GetEmbassyWorkingMonths(city models.City) (models.Date, models.Date) {
+func (p *Parser) GetEmbassyWorkingMonths(city gorm_models.City) (datetime.Date, datetime.Date) {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
 	funcs.SleepTime(15, 20)
-	now := models.NewDateNow()
-	checkingDate := models.NewDateYM(now.Year(), now.Month())
-	start := models.NewBlankDate()
-	var end models.Date
+	now := datetime.NewDateNow()
+	checkingDate := datetime.NewDateYM(now.Year(), now.Month())
+	start := datetime.NewBlankDate()
+	var end datetime.Date
 	for {
 		isWorking := p.isEmbassyWorksInMonth(city, checkingDate)
 		if isWorking == "yes" {
-			if start == models.NewBlankDate() {
+			if start == datetime.NewBlankDate() {
 				start = checkingDate
 			}
 			end = checkingDate
@@ -77,7 +78,7 @@ func (p *Parser) GetEmbassyWorkingMonths(city models.City) (models.Date, models.
 	}
 }
 
-func (p *Parser) CheckEmbassyWork(city models.City) string {
+func (p *Parser) CheckEmbassyWork(city gorm_models.City) string {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
 	funcs.Sleep()
 	doc := p.getParsedSoup(funcs.Linkify("calendar.do?consularPost=", city.Id))
@@ -90,12 +91,12 @@ func (p *Parser) CheckEmbassyWork(city models.City) string {
 	return "yes"
 }
 
-func (p *Parser) CitiesWithWorkingEmbassy() []models.City {
-	var workingCities []models.City
+func (p *Parser) CitiesWithWorkingEmbassy() []gorm_models.City {
+	var workingCities []gorm_models.City
 	p.Db.Find(&workingCities)
 	return workingCities
 }
 
-func (p *Parser) CityWithWorkingEmbassy(index int) models.City {
+func (p *Parser) CityWithWorkingEmbassy(index int) gorm_models.City {
 	return p.CitiesWithWorkingEmbassy()[index]
 }

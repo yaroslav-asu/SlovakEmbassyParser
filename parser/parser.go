@@ -4,6 +4,7 @@ import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	gorm_models "main/internal/datetime"
 	"main/internal/session"
 	"main/internal/utils/db"
 	"main/models"
@@ -14,7 +15,7 @@ import (
 type Parser struct {
 	Session *http.Client
 	Db      *gorm.DB
-	Date    models.Date
+	Date    gorm_models.Date
 }
 
 func NewParser() Parser {
@@ -23,7 +24,7 @@ func NewParser() Parser {
 	return Parser{
 		Session: client,
 		Db:      db.Connect(),
-		Date:    models.NewDateYM(now.Year(), int(now.Month())),
+		Date:    gorm_models.NewDateYM(now.Year(), int(now.Month())),
 	}
 }
 func (p *Parser) Deconstruct() {
@@ -43,6 +44,13 @@ func (p *Parser) getParsedSoup(link string) soup.Root {
 		return soup.Root{}
 	}
 	return soup.HTMLParse(doc)
+}
+func (p *Parser) get(link string) *http.Response {
+	res, err := p.Session.Get(link)
+	if err != nil {
+		zap.L().Error("Cant get: " + link)
+	}
+	return res
 }
 
 func (p *Parser) SaveToDB(model models.DbModel) {
