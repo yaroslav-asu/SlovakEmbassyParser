@@ -4,14 +4,13 @@ import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"main/internal/utils/funcs"
-	"main/internal/utils/vars"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
 )
 
-func LogIn() *http.Client {
-	zap.L().Info("Started to log in user")
+func LogIn(username, password string) *http.Client {
+	zap.L().Info("Started to log in user: " + username)
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		zap.L().Warn("Failed to create cookie jar")
@@ -21,7 +20,7 @@ func LogIn() *http.Client {
 	if err != nil {
 		zap.L().Warn("Can't get session.do cookies page")
 	}
-	res, err := client.PostForm(funcs.Linkify("j_spring_security_check"), url.Values{"j_username": {vars.DefaultUserName}, "j_password": {vars.DefaultUserPassword}})
+	res, err := client.PostForm(funcs.Linkify("j_spring_security_check"), url.Values{"j_username": {username}, "j_password": {password}})
 	if err != nil {
 		zap.L().Warn("Can't post form to log in")
 	}

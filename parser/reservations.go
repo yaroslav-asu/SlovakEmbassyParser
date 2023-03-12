@@ -32,7 +32,7 @@ func AvailableReservationsInDay(data string) int {
 func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reservations, gorm.Reservations) {
 	funcs.Sleep()
 	var availableReservations, unavailableReservations gorm.Reservations
-	dateString := date.Format(datetime.BasicDate)
+	dateString := date.Format(datetime.DateOnly)
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
 	res, err := p.getSoup(funcs.Linkify("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
 	if err != nil {

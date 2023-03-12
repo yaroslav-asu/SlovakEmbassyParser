@@ -7,6 +7,7 @@ import (
 	gorm_models "main/internal/datetime"
 	"main/internal/session"
 	"main/internal/utils/db"
+	"main/internal/utils/vars"
 	"main/models"
 	"net/http"
 	"time"
@@ -19,7 +20,7 @@ type Parser struct {
 }
 
 func NewParser() Parser {
-	client := session.LogIn()
+	client := session.LogIn(vars.DefaultUserName, vars.DefaultUserPassword)
 	now := time.Now()
 	return Parser{
 		Session: client,
