@@ -1,14 +1,16 @@
-package models
+package gorm
 
 import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"main/internal/datetime"
+	"main/models"
 )
 
 type Reservation struct {
 	Id     uint `gorm:"primaryKey"`
 	CityId string
-	Date   Date
+	Date   datetime.Date
 }
 
 func (r Reservation) SaveToDB(db *gorm.DB) {
@@ -20,7 +22,7 @@ func (r Reservation) DeleteFromDB(db *gorm.DB) {
 	db.Where("date = ? and id = ?", r.Date, r.CityId).Delete(&r)
 }
 
-type Reservations []DbModel
+type Reservations []models.DbModel
 
 func (r Reservations) SaveToDB(db *gorm.DB) {
 	for reservationId := range r {

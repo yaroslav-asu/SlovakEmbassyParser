@@ -1,4 +1,4 @@
-package models
+package datetime
 
 import (
 	"database/sql"
@@ -13,7 +13,9 @@ type Date time.Time
 
 var (
 	MonthAndYear = "01.2006"
-	BasicDate    = "02.01.2006"
+	DateOnly     = "02.01.2006"
+	DateTime     = "15:04 02.01.2006"
+	FormDateTime = "02.01.2006 15:04"
 )
 
 // Scan implementation for Gorm
