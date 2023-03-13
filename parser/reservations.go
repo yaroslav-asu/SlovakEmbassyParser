@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"main/internal/datetime"
 	"main/internal/utils/funcs"
@@ -34,11 +33,7 @@ func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reser
 	var availableReservations, unavailableReservations gorm.Reservations
 	dateString := date.Format(datetime.DateOnly)
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
-	res, err := p.getSoup(funcs.Linkify("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
-	if err != nil {
-		zap.L().Warn("Got error, from getting datetime page of: " + dateString + " in " + city.Name + ":\n" + err.Error())
-	}
-	doc := soup.HTMLParse(res)
+	doc := p.Session.GetParsedSoup(funcs.Linkify("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
 	trs := doc.FindAll("tr")
 	for _, tr := range trs {
 		conditionNode := tr.Find("td", "class", "calendarDayTableRow")

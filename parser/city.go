@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"main/internal/datetime"
 	"main/internal/utils/funcs"
@@ -13,11 +12,7 @@ import (
 func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 	zap.L().Info("Getting all cities with embassies")
 	funcs.Sleep()
-	res, err := p.getSoup(funcs.Linkify("consularPost.do"))
-	if err != nil {
-		zap.L().Warn("Failed to connect to /consularPost.do page to get available cities")
-	}
-	doc := soup.HTMLParse(res)
+	doc := p.Session.GetParsedSoup(funcs.Linkify("consularPost.do"))
 	for _, el := range doc.FindAll("option") {
 		fmt.Println(el.Text())
 	}
@@ -35,7 +30,6 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 		} else {
 			p.DeleteFromDB(city)
 		}
-
 	}
 	zap.L().Info("Successfully got all cities with embassies")
 }
@@ -81,7 +75,7 @@ func (p *Parser) GetEmbassyWorkingMonths(city gorm_models.City) (datetime.Date, 
 func (p *Parser) CheckEmbassyWork(city gorm_models.City) string {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
 	funcs.Sleep()
-	doc := p.getParsedSoup(funcs.Linkify("calendar.do?consularPost=", city.Id))
+	doc := p.Session.GetParsedSoup(funcs.Linkify("calendar.do?consularPost=", city.Id))
 	monthCell := doc.Find("td", "class", "calendarMonthCell")
 	if monthCell.Error != nil {
 		zap.L().Info("Embassy in " + city.Name + " with id: " + city.Id + " doesn't work")
