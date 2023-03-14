@@ -9,18 +9,18 @@ import (
 	"net/url"
 )
 
-func (s Session) LogIn(username, password string) {
+func (s *Session) LogIn(username, password string) {
 	zap.L().Info("Started to log in user: " + username)
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		zap.L().Warn("Failed to create cookie jar")
 	}
-	s.client = http.Client{Jar: cookieJar}
-	_, err = s.client.Get(funcs.Linkify("session.do"))
+	s.Client = &http.Client{Jar: cookieJar}
+	_, err = s.Client.Get(funcs.Linkify("session.do"))
 	if err != nil {
 		zap.L().Warn("Can't get session.do cookies page")
 	}
-	res, err := s.client.PostForm(
+	res, err := s.Client.PostForm(
 		funcs.Linkify("j_spring_security_check"),
 		url.Values{
 			"j_username": {username},
@@ -30,7 +30,7 @@ func (s Session) LogIn(username, password string) {
 	if err != nil {
 		zap.L().Warn("Can't post form to log in")
 	}
-	res, err = s.client.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
+	res, err = s.Client.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
 	if err != nil {
 		zap.L().Warn("Can't get dateOfVisitDecision.do?siteLanguage=")
 	}
@@ -42,9 +42,9 @@ func (s Session) LogIn(username, password string) {
 	defer res.Body.Close()
 }
 
-func (s Session) IsLoggedIn() bool {
+func (s *Session) IsLoggedIn() bool {
 	zap.L().Info("Started checking is user logged in")
-	loggedInRes, err := soup.GetWithClient(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="), &s.client)
+	loggedInRes, err := soup.GetWithClient(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="), s.Client)
 	if err != nil {
 		zap.L().Error("Got error while accessing to greeting page from session:\n" + err.Error())
 	}
@@ -63,9 +63,9 @@ func (s Session) IsLoggedIn() bool {
 	return loggedText != loggedOutText
 }
 
-func (s Session) LogOut() {
+func (s *Session) LogOut() {
 	zap.L().Info("Starting to logout")
-	res, err := s.client.Get(funcs.Linkify("j_spring_security_logout"))
+	res, err := s.Client.Get(funcs.Linkify("j_spring_security_logout"))
 	if err != nil {
 		zap.L().Warn("Cant get logout page")
 	}

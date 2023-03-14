@@ -7,11 +7,11 @@ import (
 	"net/url"
 )
 
-func (s Session) getSoup(link string) (string, error) {
-	return soup.GetWithClient(link, &s.client)
+func (s *Session) getSoup(link string) (string, error) {
+	return soup.GetWithClient(link, s.Client)
 }
 
-func (s Session) GetParsedSoup(link string) soup.Root {
+func (s *Session) GetParsedSoup(link string) soup.Root {
 	doc, err := s.getSoup(link)
 	if err != nil {
 		zap.L().Error("Cant get: " + link)
@@ -19,16 +19,16 @@ func (s Session) GetParsedSoup(link string) soup.Root {
 	}
 	return soup.HTMLParse(doc)
 }
-func (s Session) Get(url string) *http.Response {
-	res, err := s.client.Get(url)
+func (s *Session) Get(url string) *http.Response {
+	res, err := s.Client.Get(url)
 	if err != nil {
 		zap.L().Error("Cant get: " + url)
 	}
 	return res
 }
 
-func (s Session) PostForm(url string, data url.Values) *http.Response {
-	res, err := s.client.PostForm(url, data)
+func (s *Session) PostForm(url string, data url.Values) *http.Response {
+	res, err := s.Client.PostForm(url, data)
 	if err != nil {
 		zap.L().Error("Cant post form to: " + url)
 	}

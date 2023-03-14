@@ -1,14 +1,22 @@
 package session
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type Session struct {
-	client http.Client
+	Client *http.Client
 }
 
-func NewSession(username, password string) Session {
+func NewSession() Session {
+	return Session{
+		Client: &http.Client{},
+	}
+}
+
+func NewLoggedSession(username, password string) Session {
 	session := Session{
-		client: http.Client{},
+		Client: &http.Client{},
 	}
 	session.LogIn(username, password)
 	return session

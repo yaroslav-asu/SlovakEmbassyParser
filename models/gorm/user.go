@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"main/internal/datetime"
 	"main/internal/session"
@@ -30,7 +31,7 @@ func NewUser(username, password string) User {
 	newUser := User{
 		UserName: username,
 		Password: password,
-		Session:  session.NewSession(username, password),
+		Session:  session.NewLoggedSession(username, password),
 	}
 	return newUser
 }
@@ -57,5 +58,6 @@ func (u *User) ReserveDatetime(city City, date datetime.Date) {
 }
 
 func (u *User) CheckReservation() {
-
+	doc := u.Session.GetParsedSoup(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
+	fmt.Println(funcs.StripString(doc.Find("td", "class", "infoTableInformationText").FullText()))
 }
