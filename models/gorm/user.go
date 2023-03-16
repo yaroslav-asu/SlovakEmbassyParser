@@ -1,12 +1,13 @@
 package gorm
 
 import (
-	"fmt"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"main/internal/datetime"
 	"main/internal/session"
 	"main/internal/utils/funcs"
 	"net/url"
+	"strings"
 )
 
 type User struct {
@@ -14,9 +15,15 @@ type User struct {
 	UserName   string
 	Password   string
 	TelegramId string
-	Session    session.Session `gorm:"-:migration"`
+	Session    session.Session `gorm:"-:all"`
 }
 
+func (u *User) SaveToDB(db *gorm.DB) {
+	db.FirstOrCreate(u)
+}
+func (u *User) DeleteFromDB(db *gorm.DB) {
+
+}
 func (u *User) LogIn() {
 	u.Session.LogIn(u.UserName, u.Password)
 }
@@ -57,7 +64,7 @@ func (u *User) ReserveDatetime(city City, date datetime.Date) {
 	defer res.Body.Close()
 }
 
-func (u *User) CheckReservation() {
-	doc := u.Session.GetParsedSoup(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
-	fmt.Println(funcs.StripString(doc.Find("td", "class", "infoTableInformationText").FullText()))
+func (u *User) IsReserved() bool {
+	doc := u.Session.GetParsedSoup(funcs.Linkify("dateOfVisitDecision.do"))
+	return strings.Contains(doc.Find("td", "class", "infoTableInformationText").Text(), "have reservation")
 }
