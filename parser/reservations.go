@@ -2,9 +2,9 @@ package parser
 
 import (
 	"go.uber.org/zap"
-	"main/internal/datetime"
 	"main/internal/utils/funcs"
-	"main/models/gorm"
+	gorm_models "main/models/gorm"
+	"main/models/gorm/datetime"
 	"strconv"
 	"strings"
 	"time"
@@ -28,9 +28,9 @@ func AvailableReservationsInDay(data string) int {
 	return totalNum - reservedNum
 }
 
-func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reservations, gorm.Reservations) {
+func (p *Parser) GetReservations(city gorm_models.City, date datetime.Date) (gorm_models.Reservations, gorm_models.Reservations) {
 	funcs.Sleep()
-	var availableReservations, unavailableReservations gorm.Reservations
+	var availableReservations, unavailableReservations gorm_models.Reservations
 	dateString := date.Format(datetime.DateOnly)
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
 	doc := p.Session.GetParsedSoup(funcs.Linkify("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
@@ -52,7 +52,7 @@ func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reser
 		}
 		date.SetHour(parsedTime.Hour())
 		date.ChangeMinutes(parsedTime.Minute())
-		reservation := gorm.Reservation{
+		reservation := gorm_models.Reservation{
 			CityId: city.Id,
 			Date:   date,
 		}
@@ -66,7 +66,7 @@ func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reser
 	return availableReservations, unavailableReservations
 }
 
-func (p *Parser) ParseMonthReservations(city gorm.City, date datetime.Date) {
+func (p *Parser) ParseMonthReservations(city gorm_models.City, date datetime.Date) {
 	workingDays := p.GetWorkingDaysInMonth(city, date)
 	for i := range workingDays {
 		availableReservations, unavailableReservations := p.GetReservations(city, workingDays[i].Date)

@@ -2,7 +2,7 @@ package gorm
 
 import (
 	"gorm.io/gorm"
-	"main/internal/datetime"
+	"main/models/gorm/datetime"
 )
 
 type DayCell struct {

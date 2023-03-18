@@ -3,7 +3,7 @@ package gorm
 import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"main/internal/datetime"
+	"main/models/gorm/datetime"
 )
 
 type City struct {

@@ -3,9 +3,9 @@ package gorm
 import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"main/internal/datetime"
 	"main/internal/session"
 	"main/internal/utils/funcs"
+	"main/models/gorm/datetime"
 	"net/url"
 	"strings"
 )

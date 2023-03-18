@@ -2,11 +2,11 @@ package parser
 
 import (
 	"gorm.io/gorm"
-	gorm_models "main/internal/datetime"
 	"main/internal/session"
 	"main/internal/utils/db"
 	"main/internal/utils/vars"
 	"main/models"
+	gorm_models "main/models/gorm/datetime"
 	"time"
 )
 
