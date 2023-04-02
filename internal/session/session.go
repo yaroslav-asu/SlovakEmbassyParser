@@ -1,23 +1,30 @@
 package session
 
 import (
+	gorm_models "main/models/gorm"
 	"net/http"
+	"time"
 )
+
+const requestTimeout = 10 * time.Second
 
 type Session struct {
 	Client *http.Client
+	Proxy  gorm_models.Proxy
 }
 
 func NewSession() Session {
-	return Session{
-		Client: &http.Client{},
+	session := Session{
+		Client: &http.Client{
+			Timeout: requestTimeout,
+		},
 	}
+	session.ChangeProxy()
+	return session
 }
 
-func NewLoggedSession(username, password string) Session {
-	session := Session{
-		Client: &http.Client{},
-	}
+func NewLoggedInSession(username, password string) Session {
+	session := NewSession()
 	session.LogIn(username, password)
 	return session
 }
