@@ -1,10 +1,22 @@
 package gorm
 
+import (
+	"fmt"
+	"time"
+)
+
 type Proxy struct {
 	Id          uint `gorm:"primaryKey"`
-	Url         string
-	RequestTime int
+	Ip          string
+	Port        string
+	Code        string
 	Country     string
 	Https       bool
-	Working     bool
+	IsWorking   bool
+	RequestTime time.Duration
+	LastWorking time.Time
+}
+
+func (p *Proxy) Url() string {
+	return fmt.Sprintf("http://%s:%s", p.Ip, p.Port)
 }

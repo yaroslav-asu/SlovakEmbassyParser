@@ -13,7 +13,7 @@ func (s *Session) GetParsedSoup(url string) soup.Root {
 	doc, err := soup.GetWithClient(url, s.Client)
 	if err != nil {
 		s.handleRequestError(url, err)
-		return soup.Root{}
+		return s.GetParsedSoup(url)
 	}
 	return soup.HTMLParse(doc)
 }
@@ -38,13 +38,12 @@ func (s *Session) PostForm(url string, data url.Values) *http.Response {
 
 func (s *Session) handleRequestError(url string, err error) {
 	if err, ok := err.(net.Error); ok && err.Timeout() {
-		zap.L().Warn("Proxy timeout")
-
+		zap.L().Warn("Proxy timeout: " + s.Proxy.Url())
 	} else if err != nil {
-		zap.L().Warn("Cant access to:" + url + " with proxy: " + s.Proxy.Url)
+		zap.L().Warn("Cant access to:" + url + " with proxy: " + s.Proxy.Url())
 	}
 	zap.L().Info("Trying to change proxy")
-	funcs.SleepTime(0, 1)
+	funcs.SleepTime(5, 10)
 	s.DisableCurrentProxy()
 	s.ChangeProxy()
 }

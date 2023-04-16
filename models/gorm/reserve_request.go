@@ -8,7 +8,9 @@ import (
 type ReserveRequest struct {
 	Id     uint `gorm:"primaryKey"`
 	UserId int
+	User   User
 	CityId string
+	City   City
 	Start  datetime.Date
 	End    datetime.Date
 }
@@ -18,5 +20,5 @@ func (r *ReserveRequest) SaveToDB(db *gorm.DB) {
 }
 
 func (r *ReserveRequest) DeleteFromDB(db *gorm.DB) {
-
+	db.Delete(r)
 }

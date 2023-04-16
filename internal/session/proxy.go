@@ -11,22 +11,22 @@ import (
 func (s *Session) ChangeProxy() {
 	dataBase := db.Connect()
 	var proxy gorm_models.Proxy
-	if s.Proxy.Url != "" {
-		dataBase.Order("request_time").Not("url = ? and working = false", s.Proxy.Url).First(&proxy)
+	if s.Proxy.Url() != "" {
+		dataBase.Where("request_time != -1 and is_working = true and ip != ? and port != ?", s.Proxy.Ip, s.Proxy.Port).Order("request_time").First(&proxy)
 	} else {
-		dataBase.Order("request_time").Not("working = false").First(&proxy)
+		dataBase.Where("request_time != -1 and is_working = true").First(&proxy)
 	}
 
 	s.Proxy = proxy
 	urlInstance := url.URL{}
-	urlProxy, err := urlInstance.Parse("http://" + proxy.Url)
+	urlProxy, err := urlInstance.Parse(proxy.Url())
 	if err != nil {
-		zap.L().Error("Failed to parse proxy url: http://" + proxy.Url)
+		zap.L().Error("Failed to parse proxy url: " + proxy.Url())
 	}
 	s.Client.Transport = &http.Transport{Proxy: http.ProxyURL(urlProxy)}
 }
 
 func (s *Session) DisableCurrentProxy() {
 	dataBase := db.Connect()
-	dataBase.Model(&s.Proxy).Update("working", false)
+	dataBase.Model(&s.Proxy).Update("is_working", false)
 }

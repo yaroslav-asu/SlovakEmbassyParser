@@ -8,5 +8,6 @@ import (
 func main() {
 	funcs.Init()
 	siteParser := parser.NewParser()
+	siteParser.RunCheckingReserveRequests()
 	defer siteParser.LogOut()
 }

@@ -10,6 +10,7 @@ import (
 type Reservation struct {
 	Id     uint `gorm:"primaryKey"`
 	CityId string
+	City   City
 	Date   datetime.Date
 }
 
