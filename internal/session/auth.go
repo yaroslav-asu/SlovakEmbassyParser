@@ -7,8 +7,8 @@ import (
 	"net/url"
 )
 
-func (s *Session) LogIn(username, password string) {
-	zap.L().Info("Started to log in user: " + username)
+func (s *Session) LogIn() {
+	zap.L().Info("Started to log in user: " + s.username)
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
 		zap.L().Warn("Failed to create cookie jar")
@@ -18,31 +18,19 @@ func (s *Session) LogIn(username, password string) {
 	res := s.PostForm(
 		funcs.Linkify("j_spring_security_check"),
 		url.Values{
-			"j_username": {username},
-			"j_password": {password},
+			"j_username": {s.username},
+			"j_password": {s.password},
 		},
 	)
+	defer res.Body.Close()
 	res = s.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
-	if !s.IsLoggedIn() {
+	root := funcs.ResponseToSoup(res)
+	if !sessionWorking(root) {
 		zap.L().Fatal("User login failed")
 	} else {
 		zap.L().Info("User successfully logged in")
 	}
 	defer res.Body.Close()
-}
-
-func (s *Session) IsLoggedIn() bool {
-	zap.L().Info("Started checking is user logged in")
-	loggedInSessionDoc := s.GetParsedSoup(funcs.Linkify("dateOfVisitDecision.do"))
-	loggedInSessionText := loggedInSessionDoc.Find("table", "class", "infoTable").FullText()
-	zap.L().Info("Got text with session")
-	funcs.Sleep()
-	blankSession := NewSession()
-	blankSessionDoc := blankSession.GetParsedSoup(funcs.Linkify("dateOfVisitDecision.do"))
-	blankSessionText := blankSessionDoc.Find("table", "class", "infoTable").FullText()
-	zap.L().Info("Got text without session")
-	defer zap.L().Info("Finished checking is user logged in")
-	return loggedInSessionText != blankSessionText
 }
 
 func (s *Session) LogOut() {

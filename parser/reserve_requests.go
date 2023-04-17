@@ -30,6 +30,8 @@ func (p *Parser) RunCheckingReserveRequests() {
 								reserveRequestOwner.ReserveDatetime(reservation.City, reservation.Date)
 								if reserveRequestOwner.IsReserved() {
 									zap.L().Info("User: " + userModel.UserName + "successfully reserved: " + reservation.Date.Format(datetime.DateTime))
+								} else {
+									zap.L().Error("Failed to reserve user: " + userModel.UserName + " to: " + reservation.Date.Format(datetime.DateTime))
 								}
 							}
 						}
@@ -39,6 +41,6 @@ func (p *Parser) RunCheckingReserveRequests() {
 				zap.L().Info("User already reserved")
 			}
 		}
-		funcs.Sleep()
+		funcs.SleepTime(10, 90)
 	}
 }

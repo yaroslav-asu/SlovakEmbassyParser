@@ -16,7 +16,7 @@ type User struct {
 }
 
 func (u *User) LogIn() {
-	u.Session.LogIn(u.DB.UserName, u.DB.Password)
+	u.Session.LogIn()
 }
 
 func (u *User) LogOut() {

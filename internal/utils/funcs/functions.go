@@ -2,10 +2,13 @@ package funcs
 
 import (
 	"fmt"
+	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
+	"io"
 	"main/internal/logger"
 	"main/internal/utils/vars"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -73,4 +76,14 @@ func SleepTime(from, to float64) {
 	zap.L().Info("Started random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
 	time.Sleep(time.Duration(sleepingTime) * time.Second)
 	zap.L().Info("Finished random sleeping with time: " + fmt.Sprintf("%.2f", sleepingTime))
+}
+
+func ResponseToSoup(res *http.Response) soup.Root {
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		zap.L().Error("Failed to read response")
+		return soup.Root{}
+	}
+	html := string(body)
+	return soup.HTMLParse(html)
 }
