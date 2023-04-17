@@ -13,14 +13,14 @@ func (p *Parser) RunCheckingReserveRequests() {
 		zap.L().Info("Updating reserve requests")
 		var reserveRequests []gorm_models.ReserveRequest
 		p.Db.Find(&reserveRequests)
-		p.Db.Preload("User").Find(&reserveRequests)
-		p.Db.Preload("City").Find(&reserveRequests)
+		p.Db.Preload("User").Preload("City").Find(&reserveRequests)
 		for _, request := range reserveRequests {
 			zap.L().Info("Checking reserve request with owner: " + request.User.UserName + " in embassy: " + request.City.Name + " form: " + request.Start.Format(datetime.DateTime) + " to: " + request.End.Format(datetime.DateTime))
 			if !request.User.IsReserved {
 				for currentDate := request.Start; currentDate.Year() <= request.End.Year() && currentDate.Month() <= request.End.Month(); currentDate.MoveMonth(1) {
 					zap.L().Info("Checking date: " + currentDate.Format(datetime.DateOnly))
 					for _, dayCell := range p.GetWorkingDaysInMonth(request.City, currentDate) {
+						p.Db.Where("id = ?", dayCell.CityId).First(&dayCell.City)
 						if dayCell.AvailableReservations > 0 {
 							zap.L().Info("Found free reservation at: " + dayCell.City.Name + ", trying to reserve")
 							availableReservations, _ := p.GetReservations(dayCell.City, dayCell.Date)
