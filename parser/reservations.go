@@ -2,9 +2,9 @@ package parser
 
 import (
 	"go.uber.org/zap"
-	"main/internal/datetime"
 	"main/internal/utils/funcs"
-	"main/models/gorm"
+	gorm_models "main/models/gorm"
+	"main/models/gorm/datetime"
 	"strconv"
 	"strings"
 	"time"
@@ -28,9 +28,9 @@ func AvailableReservationsInDay(data string) int {
 	return totalNum - reservedNum
 }
 
-func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reservations, gorm.Reservations) {
+func (p *Parser) GetReservations(city gorm_models.City, date datetime.Date) ([]gorm_models.Reservation, []gorm_models.Reservation) {
 	funcs.Sleep()
-	var availableReservations, unavailableReservations gorm.Reservations
+	var availableReservations, unavailableReservations []gorm_models.Reservation
 	dateString := date.Format(datetime.DateOnly)
 	zap.L().Info("Started parsing available reservations of: " + dateString + " in " + city.Name)
 	doc := p.Session.GetParsedSoup(funcs.Linkify("calendarDay.do?day=", dateString, "&consularPostId=", city.Id))
@@ -52,7 +52,7 @@ func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reser
 		}
 		date.SetHour(parsedTime.Hour())
 		date.ChangeMinutes(parsedTime.Minute())
-		reservation := gorm.Reservation{
+		reservation := gorm_models.Reservation{
 			CityId: city.Id,
 			Date:   date,
 		}
@@ -64,28 +64,4 @@ func (p *Parser) GetReservations(city gorm.City, date datetime.Date) (gorm.Reser
 	}
 	zap.L().Info("Finished parsing available reservations of: " + dateString + " in " + city.Name)
 	return availableReservations, unavailableReservations
-}
-
-func (p *Parser) ParseMonthReservations(city gorm.City, date datetime.Date) {
-	workingDays := p.GetWorkingDaysInMonth(city, date)
-	for i := range workingDays {
-		availableReservations, unavailableReservations := p.GetReservations(city, workingDays[i].Date)
-		if workingDays[i].AvailableReservations > 0 {
-			p.SaveToDB(availableReservations)
-		}
-		p.DeleteFromDB(unavailableReservations)
-		funcs.SleepTime(5, 10)
-	}
-}
-
-func (p *Parser) ParseReservations() {
-	cities := p.CitiesWithWorkingEmbassy()
-	for city := range cities {
-		currentCity := cities[city]
-		for date := currentCity.StartWorking; date != currentCity.EndWorking; date.MoveMonth(1) {
-			p.ParseMonthReservations(currentCity, date)
-			funcs.SleepTime(15, 30)
-		}
-		funcs.SleepTime(30, 60)
-	}
 }

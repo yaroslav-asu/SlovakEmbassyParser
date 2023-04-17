@@ -3,9 +3,9 @@ package parser
 import (
 	"fmt"
 	"go.uber.org/zap"
-	"main/internal/datetime"
 	"main/internal/utils/funcs"
 	gorm_models "main/models/gorm"
+	"main/models/gorm/datetime"
 	"strings"
 )
 

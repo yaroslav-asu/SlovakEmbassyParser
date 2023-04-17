@@ -1,13 +1,12 @@
 package gorm
 
 import (
-	"gorm.io/gorm"
-	"main/internal/datetime"
+	"main/models/gorm/datetime"
 )
 
 type DayCell struct {
 	AvailableReservations int
 	CityId                string
+	City                  City
 	Date                  datetime.Date
-	gorm.Model
 }

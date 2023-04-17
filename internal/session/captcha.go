@@ -8,8 +8,8 @@ import (
 	"os"
 )
 
-func (s Session) DownloadCaptcha() {
-	res, err := s.client.Get(funcs.Linkify("simpleCaptcha.png"))
+func (s *Session) DownloadCaptcha() {
+	res, err := s.Client.Get(funcs.Linkify("simpleCaptcha.png"))
 	if err != nil {
 		zap.L().Error(err.Error())
 	}

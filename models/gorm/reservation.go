@@ -3,13 +3,14 @@ package gorm
 import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"main/internal/datetime"
 	"main/models"
+	"main/models/gorm/datetime"
 )
 
 type Reservation struct {
 	Id     uint `gorm:"primaryKey"`
 	CityId string
+	City   City
 	Date   datetime.Date
 }
 
