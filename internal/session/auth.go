@@ -11,7 +11,7 @@ func (s *Session) LogIn() {
 	zap.L().Info("Started to log in user: " + s.username)
 	cookieJar, err := cookiejar.New(nil)
 	if err != nil {
-		zap.L().Warn("Failed to create cookie jar")
+		zap.L().Error("Failed to create cookie jar")
 	}
 	s.Client.Jar = cookieJar
 	s.Get(funcs.Linkify("session.do"))
