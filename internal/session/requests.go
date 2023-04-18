@@ -11,14 +11,14 @@ import (
 
 func (s *Session) GetParsedSoup(url string) soup.Root {
 	doc, err := soup.GetWithClient(url, s.Client)
+	if err != nil {
+		s.handleRequestError(url, err)
+		return s.GetParsedSoup(url)
+	}
 	parsedSoup := soup.HTMLParse(doc)
 	if !sessionWorking(parsedSoup) {
 		zap.L().Warn("Session cookies aren't valid, starting to log in")
 		s.LogIn()
-		return s.GetParsedSoup(url)
-	}
-	if err != nil {
-		s.handleRequestError(url, err)
 		return s.GetParsedSoup(url)
 	}
 	return parsedSoup
@@ -27,13 +27,13 @@ func (s *Session) GetParsedSoup(url string) soup.Root {
 func (s *Session) Get(url string) *http.Response {
 	res, err := s.Client.Get(url)
 	parsedSoup := funcs.ResponseToSoup(res)
+	if err != nil {
+		s.handleRequestError(url, err)
+		return s.Get(url)
+	}
 	if !sessionWorking(parsedSoup) {
 		zap.L().Warn("Session cookies aren't valid, starting to log in")
 		s.LogIn()
-		return s.Get(url)
-	}
-	if err != nil {
-		s.handleRequestError(url, err)
 		return s.Get(url)
 	}
 	return res
