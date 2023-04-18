@@ -26,6 +26,7 @@ func (u *User) LogOut() {
 }
 
 func NewUser(username, password string) User {
+	zap.L().Info("Creating new user")
 	newUser := User{
 		Session: session.NewLoggedInSession(username, password),
 		DB: gorm_models.User{

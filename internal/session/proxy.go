@@ -1,6 +1,7 @@
 package session
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"main/internal/utils/db"
@@ -29,10 +30,22 @@ func (s *Session) ChangeProxy() {
 	var proxy gorm_models.Proxy
 	dataBase := db.Connect()
 	err := s.findSuitableProxy(dataBase, &proxy)
+	unknownErrCounter := 0
 	for err != nil {
-		zap.L().Error("Failed to find working proxy, waiting for new one")
-		time.Sleep(proxyWaitTime)
-		err = s.findSuitableProxy(dataBase, &proxy)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			zap.L().Error("Failed to find working proxy, waiting for new one")
+			time.Sleep(proxyWaitTime)
+			err = s.findSuitableProxy(dataBase, &proxy)
+		} else {
+			zap.L().Error("Unknown error occurred while finding working proxies: " + err.Error())
+			zap.L().Warn("Trying to repeat")
+			err = s.findSuitableProxy(dataBase, &proxy)
+			unknownErrCounter++
+			if unknownErrCounter == 5 {
+				zap.L().Warn("Can't find proxies" + err.Error())
+				break
+			}
+		}
 	}
 	s.Proxy = proxy
 	urlInstance := url.URL{}

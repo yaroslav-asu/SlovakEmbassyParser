@@ -9,10 +9,7 @@ import (
 )
 
 func (s *Session) DownloadCaptcha() {
-	res, err := s.Client.Get(funcs.Linkify("simpleCaptcha.png"))
-	if err != nil {
-		zap.L().Error(err.Error())
-	}
+	res := s.Get(funcs.Linkify("simpleCaptcha.png"))
 	defer res.Body.Close()
 	file, err := os.Create("captcha.png")
 	if err != nil {

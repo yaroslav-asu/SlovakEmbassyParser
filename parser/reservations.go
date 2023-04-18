@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func AvailableReservationsInDay(data string) int {
+func availableReservationsInDay(data string) int {
 	for _, s := range []string{"[", "]"} {
 		data = strings.Replace(data, s, "", -1)
 	}
@@ -47,7 +47,7 @@ func (p *Parser) GetReservations(city gorm_models.City, date datetime.Date) ([]g
 		textTime := funcs.StripString(timeNode.Text())
 		parsedTime, err := time.Parse("15:04", textTime)
 		if err != nil {
-			zap.L().Error("Error on trying to parse time")
+			zap.L().Fatal("Error on trying to parse time: " + textTime)
 			continue
 		}
 		date.SetHour(parsedTime.Hour())

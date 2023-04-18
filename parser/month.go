@@ -39,7 +39,7 @@ func (p *Parser) GetWorkingDaysInMonth(city gorm_models.City, date datetime.Date
 			continue
 		}
 		dateText := funcs.StripString(dateNode.Text()) + strconv.Itoa(date.Year())
-		availableReservations := AvailableReservationsInDay(reservationData)
+		availableReservations := availableReservationsInDay(reservationData)
 		date := datetime.ParseDateFromString(dateText)
 		dayCell := gorm_models.DayCell{
 			AvailableReservations: availableReservations,
