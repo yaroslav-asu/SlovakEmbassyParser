@@ -64,6 +64,7 @@ func (s *Session) GetCaptchaSolve() string {
 
 func (s *Session) solveCaptcha() string {
 	s.SendCaptchaToSolve()
+	s.captcha.DeleteCaptcha()
 	time.Sleep(CaptchaSolveWaitTime)
 	return s.GetCaptchaSolve()
 }

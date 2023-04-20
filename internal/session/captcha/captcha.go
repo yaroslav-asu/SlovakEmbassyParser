@@ -38,3 +38,10 @@ func (c Captcha) SolveCaptchaOffline() string {
 	}
 	return textCaptcha
 }
+
+func (c Captcha) DeleteCaptcha() {
+	err := os.Remove(c.Path())
+	if err != nil {
+		zap.L().Warn("Failed to delete captcha: '" + c.title + "'")
+	}
+}

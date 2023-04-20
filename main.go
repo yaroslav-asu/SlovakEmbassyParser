@@ -8,7 +8,6 @@ import (
 
 func main() {
 	funcs.Init()
-
 	s := session.NewBlankProxiedSession()
 	solve := s.SolveNewCaptcha()
 	fmt.Println(solve)
