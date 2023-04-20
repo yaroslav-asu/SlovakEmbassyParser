@@ -25,12 +25,12 @@ func (s *Session) LogIn() {
 	defer res.Body.Close()
 	res = s.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
 	root := funcs.ResponseToSoup(res)
+	defer res.Body.Close()
 	if !sessionWorking(root) {
 		zap.L().Fatal("User login failed")
 	} else {
 		zap.L().Info("User successfully logged in")
 	}
-	defer res.Body.Close()
 }
 
 func (s *Session) LogOut() {

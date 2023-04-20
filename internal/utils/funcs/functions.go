@@ -1,11 +1,13 @@
 package funcs
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
 	"io"
 	"main/internal/logger"
+	"main/internal/session/captcha"
 	"main/internal/utils/vars"
 	"math/rand"
 	"net/http"
@@ -45,6 +47,7 @@ func isRuneInList(checkingRune rune, runes []rune) bool {
 func Init() {
 	vars.InitEnv()
 	logger.InitLogger()
+	captcha.InitCaptcha()
 }
 
 func Linkify(linkParts ...string) string {
@@ -85,5 +88,6 @@ func ResponseToSoup(res *http.Response) soup.Root {
 		return soup.Root{}
 	}
 	html := string(body)
+	res.Body = io.NopCloser(bytes.NewBuffer(body))
 	return soup.HTMLParse(html)
 }
