@@ -11,6 +11,7 @@ var (
 	DefaultUserName     string
 	DefaultUserPassword string
 	RunningMode         string
+	RuCaptchaApiKey     string
 	DbUser              string
 	DbPassword          string
 	DbName              string
@@ -26,8 +27,8 @@ func InitDefaultEnv() {
 	DefaultUserName = os.Getenv("DEFAULT_USER_NAME")
 	DefaultUserPassword = os.Getenv("DEFAULT_USER_PASSWORD")
 	RunningMode = os.Getenv("RUNNING_MODE")
+	RuCaptchaApiKey = os.Getenv("RUCAPTCHA_API_KEY")
 	zap.L().Info("Finished initializing environmental vars")
-
 }
 
 func InitDbEnv() {
