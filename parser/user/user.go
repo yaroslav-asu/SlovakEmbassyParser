@@ -37,13 +37,19 @@ func NewUser(username, password string) User {
 	return newUser
 }
 
+func NewUserFromModel(user gorm_models.User) User {
+	return User{
+		Session: session.NewLoggedInSession(user.UserName, user.Password),
+		DB:      user,
+	}
+}
+
 func (u *User) ReserveDatetime(city gorm_models.City, date datetime.Date) {
 	zap.L().Info("Starting to reserve date in: " + city.Name + " at: " + date.Format(datetime.DateTime))
 	res := u.Session.Get(funcs.Linkify("calendarDay.do?day=", date.Format(datetime.DateOnly), "&timeSlotId=&calendarId=&consularPostId=", city.Id))
 	defer res.Body.Close()
 	funcs.Sleep()
-	u.Session.DownloadCaptcha()
-	captchaSolve := session.SolveCaptcha()
+	captchaSolve := u.Session.SolveNewCaptcha()
 	res = u.Session.PostForm(
 		funcs.Linkify("calendarDay.do?day=", date.Format(datetime.DateOnly), "&consularPostId=", city.Id),
 		url.Values{

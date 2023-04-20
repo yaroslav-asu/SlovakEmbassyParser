@@ -33,12 +33,12 @@ func (s *Session) ChangeProxy() {
 	unknownErrCounter := 0
 	for err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			zap.L().Error("Failed to find working proxy, waiting for new one")
+			zap.L().Info("Failed to find working proxy, waiting for new one")
 			time.Sleep(proxyWaitTime)
 			err = s.findSuitableProxy(dataBase, &proxy)
 		} else {
 			zap.L().Error("Unknown error occurred while finding working proxies: " + err.Error())
-			zap.L().Warn("Trying to repeat")
+			zap.L().Info("Trying to repeat")
 			err = s.findSuitableProxy(dataBase, &proxy)
 			unknownErrCounter++
 			if unknownErrCounter == 5 {

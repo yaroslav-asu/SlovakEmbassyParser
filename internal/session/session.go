@@ -3,6 +3,7 @@ package session
 import (
 	"github.com/anaskhan96/soup"
 	"go.uber.org/zap"
+	"main/internal/session/captcha"
 	gorm_models "main/models/gorm"
 	"net/http"
 	"time"
@@ -13,22 +14,27 @@ const requestTimeout = 30 * time.Second
 type Session struct {
 	Client   *http.Client
 	Proxy    gorm_models.Proxy
+	captcha  captcha.Captcha
 	username string
 	password string
 }
 
 func NewBlankSession() Session {
-	session := Session{
+	return Session{
 		Client: &http.Client{
 			Timeout: requestTimeout,
 		},
 	}
+}
+
+func NewBlankProxiedSession() Session {
+	session := NewBlankSession()
 	session.ChangeProxy()
 	return session
 }
 
 func NewSession(username, password string) Session {
-	session := NewBlankSession()
+	session := NewBlankProxiedSession()
 	session.username = username
 	session.password = password
 	return session

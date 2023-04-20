@@ -26,11 +26,11 @@ func (s *Session) GetParsedSoup(url string) soup.Root {
 
 func (s *Session) Get(url string) *http.Response {
 	res, err := s.Client.Get(url)
-	parsedSoup := funcs.ResponseToSoup(res)
 	if err != nil {
 		s.handleRequestError(url, err)
 		return s.Get(url)
 	}
+	parsedSoup := funcs.ResponseToSoup(res)
 	if !sessionWorking(parsedSoup) {
 		zap.L().Warn("Session cookies aren't valid, starting to log in")
 		s.LogIn()
@@ -50,9 +50,9 @@ func (s *Session) PostForm(url string, data url.Values) *http.Response {
 
 func (s *Session) handleRequestError(url string, err error) {
 	if err, ok := err.(net.Error); ok && err.Timeout() {
-		zap.L().Warn("Proxy timeout: " + s.Proxy.Url())
+		zap.L().Info("Proxy timeout: " + s.Proxy.Url())
 	} else if err != nil {
-		zap.L().Warn("Cant access to:" + url + " with proxy: " + s.Proxy.Url())
+		zap.L().Info("Cant access to:" + url + " with proxy: " + s.Proxy.Url())
 	}
 	zap.L().Info("Trying to change proxy")
 	funcs.SleepTime(5, 10)

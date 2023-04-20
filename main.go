@@ -1,13 +1,14 @@
 package main
 
 import (
+	"fmt"
+	"main/internal/session"
 	"main/internal/utils/funcs"
-	"main/parser"
 )
 
 func main() {
 	funcs.Init()
-	siteParser := parser.NewParser()
-	siteParser.RunCheckingReserveRequests()
-	defer siteParser.LogOut()
+	s := session.NewBlankProxiedSession()
+	solve := s.SolveNewCaptcha()
+	fmt.Println(solve)
 }
