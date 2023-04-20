@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"gorm.io/gorm"
+	"main/internal/utils/db"
 )
 
 type User struct {
@@ -12,9 +12,9 @@ type User struct {
 	TelegramId string
 }
 
-func (u *User) SaveToDB(db *gorm.DB) {
-	db.FirstOrCreate(u)
+func (u *User) SaveToDB(db *db.DB) {
+	db.DB.FirstOrCreate(u)
 }
-func (u *User) DeleteFromDB(db *gorm.DB) {
-	db.Delete(u)
+func (u *User) DeleteFromDB(db *db.DB) {
+	db.DB.Delete(u)
 }

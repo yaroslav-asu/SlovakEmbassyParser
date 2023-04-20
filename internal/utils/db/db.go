@@ -8,9 +8,16 @@ import (
 	"gorm.io/gorm/logger"
 	"main/internal/utils/vars"
 	gorm_models "main/models/gorm"
+	"time"
 )
 
-func Connect() *gorm.DB {
+var reconnectTime = 5 * time.Second
+
+type DB struct {
+	DB *gorm.DB
+}
+
+func Connect() *DB {
 	dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s", vars.DbUser, vars.DbPassword, vars.DbName)
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
@@ -18,12 +25,27 @@ func Connect() *gorm.DB {
 	if err != nil {
 		zap.L().Error("Failed to connect db")
 		zap.L().Info("Trying to reconnect db")
+		time.Sleep(reconnectTime)
+		reconnectTime *= 2
 		return Connect()
 	}
 	err = db.AutoMigrate(&gorm_models.Reservation{}, &gorm_models.City{}, &gorm_models.ReserveRequest{}, &gorm_models.User{})
 	if err != nil {
 		zap.L().Error("failed to auto migrate database")
-		zap.L().Warn("Continuing without auto migration")
+		zap.L().Info("Continuing without auto migration")
 	}
-	return db
+	return &DB{DB: db}
+}
+
+func (db *DB) Close() {
+	postgresDB, err := db.DB.DB()
+	if err != nil {
+		zap.L().Error("Failed to get db instance: " + err.Error())
+		zap.L().Info("DB connection wasn't close")
+		return
+	}
+	err = postgresDB.Close()
+	if err != nil {
+		zap.L().Info("DB connection wasn't close: " + err.Error())
+	}
 }

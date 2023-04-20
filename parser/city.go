@@ -89,7 +89,7 @@ func (p *Parser) CheckEmbassyWork(city gorm_models.City) string {
 
 func (p *Parser) CitiesWithWorkingEmbassy() []gorm_models.City {
 	var workingCities []gorm_models.City
-	p.Db.Find(&workingCities)
+	p.DB.DB.Find(&workingCities)
 	return workingCities
 }
 
