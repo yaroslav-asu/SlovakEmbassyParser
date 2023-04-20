@@ -10,28 +10,30 @@ import (
 	"main/internal/utils/vars"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 )
 
 const CaptchaSolveWaitTime = 2 * time.Second
 
 func (s *Session) DownloadCaptcha() captcha.Captcha {
+	zap.L().Info("Starting to download captcha of user: " + s.username)
 	res := s.Get(funcs.Linkify("simpleCaptcha.png"))
-	newCaptcha := captcha.NewCaptcha(s.username)
-	file, err := os.Create(newCaptcha.Path())
+	s.captcha = captcha.NewCaptcha(s.username)
+	file, err := os.Create(s.captcha.Path())
 	if err != nil {
-		zap.L().Error("Cant create captcha.png with error: " + err.Error())
+		zap.L().Error("Can't create captcha.png with error: " + err.Error())
 	}
 	defer file.Close()
 	_, err = io.Copy(file, res.Body)
 	if err != nil {
-		zap.L().Error("Cant write captcha bytes to file with error: " + err.Error())
+		zap.L().Error("Can't write captcha bytes to file with error: " + err.Error())
 	}
-	s.captcha = newCaptcha
-	return newCaptcha
+	return s.captcha
 }
 
 func (s *Session) SendCaptchaToSolve() {
+	zap.L().Info("Sending post request with captcha: " + s.captcha.Format())
 	res := s.PostForm(
 		"http://rucaptcha.com/in.php",
 		url.Values{
@@ -46,18 +48,27 @@ func (s *Session) SendCaptchaToSolve() {
 	)
 	response := rucaptcha.ParseRucaptchaResponse(res)
 	if response.Status != 1 {
-		zap.L().Error("Image dont sent with error title: " + response.Request + " and error text: " + response.ErrorText)
+		zap.L().Error("Captcha didn't send with error title: " + response.Request + " and error text: " + response.ErrorText)
 	}
+	zap.L().Info("Setting captcha id of rucaptcha server to session")
 	s.captcha.RucaptchaId = response.Request
 	defer res.Body.Close()
 }
 
 func (s *Session) GetCaptchaSolve() string {
 	for ; ; time.Sleep(CaptchaSolveWaitTime) {
+		zap.L().Info("Trying to get solved captcha: " + s.captcha.Format())
 		res := s.Get(fmt.Sprintf("http://rucaptcha.com/res.php?key=%s&action=get&id=%s&json=1", vars.RuCaptchaApiKey, s.captcha.RucaptchaId))
 		response := rucaptcha.ParseRucaptchaResponse(res)
-		if response.Status == 1 {
+		switch response.Status {
+		case 0:
+			zap.L().Info("Captcha isn't ready, next try will be after " + strconv.Itoa(int(CaptchaSolveWaitTime/time.Second)) + " seconds")
+		case 1:
 			return response.Request
+		default:
+			zap.L().Error("Got unknown response status: " + response.Format())
+			zap.L().Info("Breaking checking response cycle")
+			return ""
 		}
 	}
 }
@@ -66,7 +77,9 @@ func (s *Session) solveCaptcha() string {
 	s.SendCaptchaToSolve()
 	s.captcha.DeleteCaptcha()
 	time.Sleep(CaptchaSolveWaitTime)
-	return s.GetCaptchaSolve()
+	solve := s.GetCaptchaSolve()
+	zap.L().Info("Got captcha solve: " + solve)
+	return solve
 }
 
 func (s *Session) SolveNewCaptcha() string {

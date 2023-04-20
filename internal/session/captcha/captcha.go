@@ -38,10 +38,14 @@ func (c Captcha) SolveCaptchaOffline() string {
 	}
 	return textCaptcha
 }
+func (c Captcha) Format() string {
+	return fmt.Sprintf("Captcha{title: %s, RucaptchaId: %s}", c.title, c.RucaptchaId)
+}
 
 func (c Captcha) DeleteCaptcha() {
+	zap.L().Info("Starting to delete captcha: " + c.Format())
 	err := os.Remove(c.Path())
 	if err != nil {
-		zap.L().Warn("Failed to delete captcha: '" + c.title + "'")
+		zap.L().Warn("Failed to delete captcha: " + c.Format())
 	}
 }
