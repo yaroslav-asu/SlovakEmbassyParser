@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"gorm.io/gorm"
 	"main/internal/session"
 	"main/internal/utils/db"
 	"main/internal/utils/vars"
@@ -11,7 +12,7 @@ import (
 
 type Parser struct {
 	Session session.Session
-	DB      *db.DB
+	DB      *gorm.DB
 	Date    gorm_models.Date
 }
 
@@ -33,5 +34,5 @@ func (p *Parser) DeleteFromDB(model models.DbModel) {
 }
 
 func (p *Parser) Deconstruct() {
-	p.DB.Close()
+	db.Close(p.DB)
 }

@@ -1,7 +1,7 @@
 package gorm
 
 import (
-	"main/internal/utils/db"
+	"gorm.io/gorm"
 	"main/models/gorm/datetime"
 )
 
@@ -15,10 +15,10 @@ type ReserveRequest struct {
 	End    datetime.Date
 }
 
-func (r *ReserveRequest) SaveToDB(db *db.DB) {
-	db.DB.FirstOrCreate(&r)
+func (r *ReserveRequest) SaveToDB(db *gorm.DB) {
+	db.FirstOrCreate(&r)
 }
 
-func (r *ReserveRequest) DeleteFromDB(db *db.DB) {
-	db.DB.Delete(r)
+func (r *ReserveRequest) DeleteFromDB(db *gorm.DB) {
+	db.Delete(r)
 }

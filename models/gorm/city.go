@@ -2,7 +2,7 @@ package gorm
 
 import (
 	"go.uber.org/zap"
-	"main/internal/utils/db"
+	"gorm.io/gorm"
 	"main/models/gorm/datetime"
 )
 
@@ -13,11 +13,11 @@ type City struct {
 	EndWorking   datetime.Date
 }
 
-func (c City) SaveToDB(db *db.DB) {
+func (c City) SaveToDB(db *gorm.DB) {
 	zap.L().Info("Saved to DB")
-	db.DB.FirstOrCreate(&c, c)
+	db.FirstOrCreate(&c, c)
 }
 
-func (c City) DeleteFromDB(db *db.DB) {
-	db.DB.Where("id = ? and name = ?", c.Id, c.Name).Delete(&c)
+func (c City) DeleteFromDB(db *gorm.DB) {
+	db.Where("id = ? and name = ?", c.Id, c.Name).Delete(&c)
 }

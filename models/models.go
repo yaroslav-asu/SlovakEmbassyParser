@@ -1,10 +1,10 @@
 package models
 
 import (
-	"main/internal/utils/db"
+	"gorm.io/gorm"
 )
 
 type DbModel interface {
-	SaveToDB(db *db.DB)
-	DeleteFromDB(db *db.DB)
+	SaveToDB(db *gorm.DB)
+	DeleteFromDB(db *gorm.DB)
 }

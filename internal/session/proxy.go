@@ -13,12 +13,12 @@ import (
 
 const proxyWaitTime = 10 * time.Second
 
-func (s *Session) findSuitableProxy(db *db.DB, proxy *gorm_models.Proxy) error {
+func (s *Session) findSuitableProxy(db *gorm.DB, proxy *gorm_models.Proxy) error {
 	var err error
 	if s.Proxy.Url() != "" {
-		err = db.DB.Where("request_time != -1 and is_working = true and ip != ? and port != ?", s.Proxy.Ip, s.Proxy.Port).Order("request_time").First(&proxy).Error
+		err = db.Where("request_time != -1 and is_working = true and ip != ? and port != ?", s.Proxy.Ip, s.Proxy.Port).Order("request_time").First(&proxy).Error
 	} else {
-		err = db.DB.Where("request_time != -1 and is_working = true").First(&proxy).Error
+		err = db.Where("request_time != -1 and is_working = true").First(&proxy).Error
 	}
 	if err != nil {
 		return err
@@ -29,7 +29,7 @@ func (s *Session) findSuitableProxy(db *db.DB, proxy *gorm_models.Proxy) error {
 func (s *Session) ChangeProxy() {
 	var proxy gorm_models.Proxy
 	dataBase := db.Connect()
-	defer dataBase.Close()
+	defer db.Close(dataBase)
 	err := s.findSuitableProxy(dataBase, &proxy)
 	unknownErrCounter := 0
 	for err != nil {
@@ -59,6 +59,6 @@ func (s *Session) ChangeProxy() {
 
 func (s *Session) DisableCurrentProxy() {
 	dataBase := db.Connect()
-	defer dataBase.Close()
-	dataBase.DB.Model(&s.Proxy).Update("is_working", false)
+	defer db.Close(dataBase)
+	dataBase.Model(&s.Proxy).Update("is_working", false)
 }
