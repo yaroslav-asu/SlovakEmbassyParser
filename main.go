@@ -7,6 +7,7 @@ import (
 
 func main() {
 	funcs.Init()
-	p := parser.NewParser()
-	p.RunCheckingReserveRequests()
+	siteParser := parser.NewParser()
+	siteParser.RunCheckingReserveRequests()
+	defer siteParser.Deconstruct()
 }
