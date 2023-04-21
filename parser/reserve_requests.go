@@ -9,7 +9,7 @@ import (
 
 func (p *Parser) RunCheckingReserveRequests() {
 	var userModel gorm_models.User
-	p.DB.DB.Where("id = 1").First(&userModel)
+	p.DB.Where("id = 1").First(&userModel)
 	mainUser := user.NewUserFromModel(userModel)
 	for {
 		currentDate := datetime.NewDateYM(2023, 6)
