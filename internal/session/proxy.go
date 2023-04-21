@@ -29,6 +29,7 @@ func (s *Session) findSuitableProxy(db *gorm.DB, proxy *gorm_models.Proxy) error
 func (s *Session) ChangeProxy() {
 	var proxy gorm_models.Proxy
 	dataBase := db.Connect()
+	defer db.Close(dataBase)
 	err := s.findSuitableProxy(dataBase, &proxy)
 	unknownErrCounter := 0
 	for err != nil {
@@ -58,5 +59,6 @@ func (s *Session) ChangeProxy() {
 
 func (s *Session) DisableCurrentProxy() {
 	dataBase := db.Connect()
+	defer db.Close(dataBase)
 	dataBase.Model(&s.Proxy).Update("is_working", false)
 }

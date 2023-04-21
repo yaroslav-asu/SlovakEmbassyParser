@@ -1,8 +1,6 @@
 package gorm
 
-import (
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type User struct {
 	Id         uint `gorm:"primaryKey"`
