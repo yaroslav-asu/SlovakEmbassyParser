@@ -28,7 +28,7 @@ func ParseRucaptchaResponse(res *http.Response) Response {
 	var response Response
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		zap.L().Error("Failed to unmarshal text to json")
+		zap.L().Error("Failed to unmarshal text to json: " + string(body))
 	}
 	return response
 }
