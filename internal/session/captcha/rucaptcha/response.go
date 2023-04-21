@@ -15,7 +15,7 @@ type Response struct {
 }
 
 func (r *Response) Format() string {
-	return fmt.Sprintf("Response{Status: %s, Request: %s, ErrText: %s}", r.Status, r.Request, r.ErrorText)
+	return fmt.Sprintf("Response{Status: %d, Request: %s, ErrText: %s}", r.Status, r.Request, r.ErrorText)
 }
 
 func ParseRucaptchaResponse(res *http.Response) Response {
