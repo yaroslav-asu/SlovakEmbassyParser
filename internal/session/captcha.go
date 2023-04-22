@@ -17,9 +17,9 @@ import (
 const CaptchaSolveWaitTime = 2 * time.Second
 
 func (s *Session) DownloadCaptcha() captcha.Captcha {
-	zap.L().Info("Starting to download captcha of user: " + s.username)
+	zap.L().Info("Starting to download captcha of user: " + s.User.UserName)
 	res := s.Get(funcs.Linkify("simpleCaptcha.png"))
-	s.captcha = captcha.NewCaptcha(s.username)
+	s.captcha = captcha.NewCaptcha(s.User.UserName)
 	file, err := os.Create(s.captcha.Path())
 	if err != nil {
 		zap.L().Error("Can't create captcha.png with error: " + err.Error())

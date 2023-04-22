@@ -23,6 +23,7 @@ func Init() {
 		&gorm_models.Proxy{},
 		&gorm_models.City{},
 		&gorm_models.DayCell{},
+		&gorm_models.Cookie{},
 	)
 	if err != nil {
 		zap.L().Error("failed to auto migrate database")

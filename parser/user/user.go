@@ -12,27 +12,22 @@ import (
 
 type User struct {
 	Session session.Session
-	DB      gorm_models.User
 }
 
 func (u *User) LogIn() {
-	u.Session.LogIn()
+	u.Session.LogInOnline()
 }
 
 func (u *User) LogOut() {
-	zap.L().Info("Starting logout user: " + u.DB.UserName)
+	zap.L().Info("Starting logout user: " + u.Session.User.UserName)
 	u.Session.LogOut()
-	zap.L().Info("Finished logout user: " + u.DB.UserName)
+	zap.L().Info("Finished logout user: " + u.Session.User.UserName)
 }
 
 func NewUser(username, password string) User {
 	zap.L().Info("Creating new user")
 	newUser := User{
 		Session: session.NewLoggedInSession(username, password),
-		DB: gorm_models.User{
-			UserName: username,
-			Password: password,
-		},
 	}
 	return newUser
 }
@@ -40,7 +35,6 @@ func NewUser(username, password string) User {
 func NewUserFromModel(user gorm_models.User) User {
 	return User{
 		Session: session.NewLoggedInSession(user.UserName, user.Password),
-		DB:      user,
 	}
 }
 
@@ -62,8 +56,8 @@ func (u *User) ReserveDatetime(city gorm_models.City, date datetime.Date) bool {
 	defer res.Body.Close()
 	res = u.Session.Get(funcs.Linkify("logout.do"))
 	defer res.Body.Close()
-	u.DB.IsReserved = u.IsReserved()
-	return u.DB.IsReserved
+	u.Session.User.IsReserved = u.IsReserved()
+	return u.Session.User.IsReserved
 }
 
 func (u *User) IsReserved() bool {
