@@ -52,7 +52,7 @@ func (s *Session) handleRequestError(url string, err error) {
 	if err, ok := err.(net.Error); ok && err.Timeout() {
 		zap.L().Info("Proxy timeout: " + s.Proxy.Url())
 	} else if err != nil {
-		zap.L().Info("Cant access to:" + url + " with proxy: " + s.Proxy.Url())
+		zap.L().Info("Cant access to:" + url + " with proxy: " + s.Proxy.Url() + "with error: " + err.Error())
 	}
 	zap.L().Info("Trying to change proxy: " + s.Proxy.Url())
 	s.DisableCurrentProxy()

@@ -16,7 +16,7 @@ const proxyWaitTime = 10 * time.Second
 func (s *Session) findSuitableProxy(db *gorm.DB, proxy *gorm_models.Proxy) error {
 	var err error
 	if s.Proxy.Url() != "" {
-		err = db.Where("request_time != -1 and is_working = true and ip != ? and port != ?", s.Proxy.Ip, s.Proxy.Port).Order("request_time").First(&proxy).Error
+		err = db.Where("request_time != -1 and is_working = true and not (ip = ? and port = ?)", s.Proxy.Ip, s.Proxy.Port).Order("request_time").First(&proxy).Error
 	} else {
 		err = db.Where("request_time != -1 and is_working = true").First(&proxy).Error
 	}
