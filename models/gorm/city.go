@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"main/models/gorm/datetime"
@@ -20,4 +21,8 @@ func (c City) SaveToDB(db *gorm.DB) {
 
 func (c City) DeleteFromDB(db *gorm.DB) {
 	db.Where("id = ? and name = ?", c.Id, c.Name).Delete(&c)
+}
+
+func (c City) Format() string {
+	return fmt.Sprintf("City{Id: %s, Name: %s}", c.Id, c.Name)
 }

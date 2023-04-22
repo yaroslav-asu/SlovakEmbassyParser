@@ -5,7 +5,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"main/internal/utils/vars"
 	gorm_models "main/models/gorm"
 	"time"
@@ -13,11 +12,27 @@ import (
 
 var reconnectTime = 5 * time.Second
 
+func Init() {
+	db := Connect()
+	defer Close(db)
+	err := db.AutoMigrate(
+		&gorm_models.Reservation{},
+		&gorm_models.City{},
+		&gorm_models.ReserveRequest{},
+		&gorm_models.User{},
+		&gorm_models.Proxy{},
+		&gorm_models.City{},
+		&gorm_models.DayCell{},
+	)
+	if err != nil {
+		zap.L().Error("failed to auto migrate database")
+		zap.L().Info("Continuing without auto migration")
+	}
+}
+
 func Connect() *gorm.DB {
 	dbURL := fmt.Sprintf("postgres://%s:%s@localhost:5432/%s", vars.DbUser, vars.DbPassword, vars.DbName)
-	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	if err != nil {
 		zap.L().Error("Failed to connect db")
 		zap.L().Info("Trying to reconnect db")

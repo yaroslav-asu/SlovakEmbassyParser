@@ -55,6 +55,7 @@ func (s *Session) ChangeProxy() {
 		zap.L().Error("Failed to parse proxy url: " + proxy.Url())
 	}
 	s.Client.Transport = &http.Transport{Proxy: http.ProxyURL(urlProxy)}
+	zap.L().Info("Session proxy was changed to: " + proxy.Url())
 }
 
 func (s *Session) DisableCurrentProxy() {

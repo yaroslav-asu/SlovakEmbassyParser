@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"go.uber.org/zap"
-	"main/internal/utils/funcs"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -130,13 +130,26 @@ func (d *Date) Format(format string) string {
 	return d.Time().Format(format)
 }
 
+func stringsToIntArray(stringArr []string) []int {
+	intArr := make([]int, len(stringArr))
+	for i, s := range stringArr {
+		intEl, err := strconv.Atoi(s)
+		if err != nil {
+			zap.L().Error("Can't convert string to int: " + s)
+			return []int{}
+		}
+		intArr[i] = intEl
+	}
+	return intArr
+}
+
 func ParseDateFromString(dateString string) Date {
 	dateElements := strings.Split(dateString, ".")
 	if len(dateElements) != 3 {
 		zap.L().Error("Got unexpect string to parse month cell Date: " + dateString)
 		return NewBlankDate()
 	}
-	intDate := funcs.StringsToIntArray(dateElements)
+	intDate := stringsToIntArray(dateElements)
 	day, month, year := intDate[0], intDate[1], intDate[2]
 	return NewDateYMD(year, month, day)
 }

@@ -6,7 +6,7 @@ import (
 	"main/internal/utils/vars"
 )
 
-func InitLogger() {
+func Init() {
 	var logger *zap.Logger
 	var err error
 	switch vars.RunningMode {

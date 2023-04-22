@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const requestTimeout = 30 * time.Second
+const requestTimeout = 15 * time.Second
 
 type Session struct {
 	Client   *http.Client

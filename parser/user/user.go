@@ -44,9 +44,9 @@ func NewUserFromModel(user gorm_models.User) User {
 	}
 }
 
-func (u *User) ReserveDatetime(city gorm_models.City, date datetime.Date) {
+func (u *User) ReserveDatetime(city gorm_models.City, date datetime.Date) bool {
 	zap.L().Info("Starting to reserve date in: " + city.Name + " at: " + date.Format(datetime.DateTime))
-	res := u.Session.Get(funcs.Linkify("calendarDay.do?day=", date.Format(datetime.DateOnly), "&timeSlotId=&calendarId=&consularPostId=", city.Id))
+	res := u.Session.Get(funcs.Linkify("calendarDay.do?day=", date.Format(datetime.DateOnly), "&consularPostId=", city.Id))
 	defer res.Body.Close()
 	funcs.Sleep()
 	captchaSolve := u.Session.SolveNewCaptcha()
@@ -62,6 +62,8 @@ func (u *User) ReserveDatetime(city gorm_models.City, date datetime.Date) {
 	defer res.Body.Close()
 	res = u.Session.Get(funcs.Linkify("logout.do"))
 	defer res.Body.Close()
+	u.DB.IsReserved = u.IsReserved()
+	return u.DB.IsReserved
 }
 
 func (u *User) IsReserved() bool {

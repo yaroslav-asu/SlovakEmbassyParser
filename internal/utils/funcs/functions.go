@@ -1,11 +1,10 @@
 package funcs
 
 import (
-	"go.uber.org/zap"
 	"main/internal/logger"
 	"main/internal/session/captcha"
+	"main/internal/utils/db"
 	"main/internal/utils/vars"
-	"strconv"
 )
 
 func StripString(s string) string {
@@ -39,19 +38,7 @@ func isRuneInList(checkingRune rune, runes []rune) bool {
 
 func Init() {
 	vars.InitEnv()
-	logger.InitLogger()
-	captcha.InitCaptcha()
-}
-
-func StringsToIntArray(stringArr []string) []int {
-	intArr := make([]int, len(stringArr))
-	for i, s := range stringArr {
-		intEl, err := strconv.Atoi(s)
-		if err != nil {
-			zap.L().Error("Can't convert string to int: " + s)
-			return []int{}
-		}
-		intArr[i] = intEl
-	}
-	return intArr
+	logger.Init()
+	captcha.Init()
+	db.Init()
 }

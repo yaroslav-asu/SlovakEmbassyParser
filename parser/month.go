@@ -10,11 +10,11 @@ import (
 )
 
 func (p *Parser) moveToMonth(city gorm_models.City, date datetime.Date) soup.Root {
-	zap.L().Info("Starting move to month: " + date.Format(datetime.MonthAndYear))
+	zap.L().Info("Starting move to month: " + date.Format(datetime.MonthAndYear) + " in city: " + city.Format())
 	res := p.Session.GetParsedSoup(funcs.Linkify("calendar.do?month=", strconv.Itoa(date.Month()-p.Date.Month()+(date.Year()-p.Date.Year())*12), "&consularPost=", city.Id))
 	p.Date.SetMonth(date.Month())
 	p.Date.SetYear(date.Year())
-	zap.L().Info("Successfully moved to " + date.Format(datetime.MonthAndYear))
+	zap.L().Info("Successfully moved to " + date.Format(datetime.MonthAndYear) + " in city: " + city.Format())
 	return res
 }
 

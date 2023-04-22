@@ -54,8 +54,7 @@ func (s *Session) handleRequestError(url string, err error) {
 	} else if err != nil {
 		zap.L().Info("Cant access to:" + url + " with proxy: " + s.Proxy.Url())
 	}
-	zap.L().Info("Trying to change proxy")
-	funcs.SleepTime(5, 10)
+	zap.L().Info("Trying to change proxy: " + s.Proxy.Url())
 	s.DisableCurrentProxy()
 	s.ChangeProxy()
 }
