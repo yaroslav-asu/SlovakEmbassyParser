@@ -2,34 +2,63 @@ package session
 
 import (
 	"go.uber.org/zap"
+	"main/internal/utils/db"
 	"main/internal/utils/funcs"
-	"net/http/cookiejar"
+	"main/internal/utils/vars"
+	"net/http"
 	"net/url"
 )
 
 func (s *Session) LogIn() {
-	zap.L().Info("Started to log in user: " + s.username)
-	cookieJar, err := cookiejar.New(nil)
-	if err != nil {
-		zap.L().Error("Failed to create cookie jar")
+	if len(s.savedSessionCookies()) > 0 {
+		s.LogInWithCookies()
+	} else {
+		s.LogInOnline()
 	}
-	s.Client.Jar = cookieJar
+}
+
+func (s *Session) LogInOnline() {
+	zap.L().Info("Started to online log in user: " + s.User.UserName)
 	s.Get(funcs.Linkify("session.do"))
 	res := s.PostForm(
 		funcs.Linkify("j_spring_security_check"),
 		url.Values{
-			"j_username": {s.username},
-			"j_password": {s.password},
+			"j_username": {s.User.UserName},
+			"j_password": {s.User.Password},
 		},
 	)
 	defer res.Body.Close()
 	res = s.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
-	root := funcs.ResponseToSoup(res)
 	defer res.Body.Close()
-	if !sessionWorking(root) {
+	root := funcs.ResponseToSoup(res)
+	if !isLoggedIn(root) {
 		zap.L().Fatal("User login failed")
 	} else {
 		zap.L().Info("User successfully logged in")
+	}
+	s.SaveCookiesToDb()
+}
+
+func (s *Session) LogInWithCookies() {
+	zap.L().Info("Started to log in user: " + s.User.UserName + " with saved cookies")
+	dataBase := db.Connect()
+	defer db.Close(dataBase)
+	siteUrl, err := url.Parse(vars.SiteUrl)
+	if err != nil {
+		zap.L().Error("Failed to parse site url")
+		return
+	}
+	cookies := s.savedSessionCookies()
+	for _, cookie := range cookies {
+		s.Client.Jar.SetCookies(siteUrl, []*http.Cookie{cookie.Cookie()})
+	}
+	res := s.Get(funcs.Linkify("dateOfVisitDecision.do?siteLanguage="))
+	defer res.Body.Close()
+	root := funcs.ResponseToSoup(res)
+	if isLoggedIn(root) {
+		zap.L().Info("Successfully logged in by cookies")
+	} else {
+		zap.L().Error("Failed to login by cookies")
 	}
 }
 

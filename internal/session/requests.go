@@ -16,9 +16,9 @@ func (s *Session) GetParsedSoup(url string) soup.Root {
 		return s.GetParsedSoup(url)
 	}
 	parsedSoup := soup.HTMLParse(doc)
-	if !sessionWorking(parsedSoup) {
+	if !isLoggedIn(parsedSoup) {
 		zap.L().Warn("Session cookies aren't valid, starting to log in")
-		s.LogIn()
+		s.LogInOnline()
 		return s.GetParsedSoup(url)
 	}
 	return parsedSoup
@@ -31,9 +31,9 @@ func (s *Session) Get(url string) *http.Response {
 		return s.Get(url)
 	}
 	parsedSoup := funcs.ResponseToSoup(res)
-	if !sessionWorking(parsedSoup) {
+	if !isLoggedIn(parsedSoup) {
 		zap.L().Warn("Session cookies aren't valid, starting to log in")
-		s.LogIn()
+		s.LogInOnline()
 		return s.Get(url)
 	}
 	return res
