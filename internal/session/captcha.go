@@ -83,7 +83,7 @@ func (s *Session) solveCaptcha() string {
 }
 
 func (s *Session) SolveNewCaptcha() string {
-	s.DownloadCaptcha()
 	unproxiedSession := NewBlankSession()
+	unproxiedSession.captcha = s.DownloadCaptcha()
 	return unproxiedSession.solveCaptcha()
 }
