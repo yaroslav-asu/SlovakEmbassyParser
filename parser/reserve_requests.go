@@ -11,7 +11,7 @@ func (p *Parser) RunCheckingReserveRequests() {
 	var userModel gorm_models.User
 	p.DB.Where("id = 1").First(&userModel)
 	mainUser := user.NewUserFromModel(userModel)
-	for !mainUser.DB.IsReserved {
+	for !mainUser.Session.User.IsReserved {
 		currentDate := datetime.NewDateYM(2023, 6)
 		for ; currentDate.Year() <= 2023 && currentDate.Month() <= 8; currentDate.MoveMonth(1) {
 			var city gorm_models.City
