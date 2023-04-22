@@ -47,7 +47,7 @@ func NewSession(username, password string) Session {
 		UserName: username,
 		Password: password,
 	}
-	dataBase.Find(&user)
+	dataBase.Where("user_name = ? and password = ?", username, password).Find(&user)
 	session.User = user
 	return session
 }
