@@ -14,12 +14,15 @@ type City struct {
 	EndWorking   datetime.Date
 }
 
-func (c City) SaveToDB(db *gorm.DB) {
+func (c City) Update(db *gorm.DB) {
+
+}
+func (c City) Save(db *gorm.DB) {
 	zap.L().Info("Saved to DB")
 	db.FirstOrCreate(&c, c)
 }
 
-func (c City) DeleteFromDB(db *gorm.DB) {
+func (c City) Delete(db *gorm.DB) {
 	db.Where("id = ? and name = ?", c.Id, c.Name).Delete(&c)
 }
 

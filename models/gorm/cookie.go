@@ -32,12 +32,24 @@ func (c Cookie) Cookie() *http.Cookie {
 	}
 }
 
-func (c Cookie) SaveToDB(db *gorm.DB) {
-	zap.L().Info("Saved to DB")
+func (c Cookie) SaveOrCreate(db *gorm.DB) {
+	if db.Model(&Cookie{}).Where("user_id = ? and name = ?", c.UserId, c.Name).First(&Cookie{}).Error != nil {
+		c.Save(db)
+	} else {
+		c.Update(db)
+	}
+}
+
+func (c Cookie) Save(db *gorm.DB) {
+	zap.L().Info("Cookie " + c.Name + " saved to DB")
 	db.FirstOrCreate(&c, c)
 }
 
-func (c Cookie) DeleteFromDB(db *gorm.DB) {
+func (c Cookie) Update(db *gorm.DB) {
+	db.Model(&Cookie{}).Where("user_id = ? and name = ?", c.UserId, c.Name).Update("value", c.Value)
+}
+
+func (c Cookie) Delete(db *gorm.DB) {
 	db.Where("id = ?", c.Id).Delete(&c)
 }
 

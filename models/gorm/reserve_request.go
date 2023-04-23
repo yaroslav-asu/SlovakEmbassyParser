@@ -15,10 +15,14 @@ type ReserveRequest struct {
 	End    datetime.Date
 }
 
-func (r *ReserveRequest) SaveToDB(db *gorm.DB) {
+func (r *ReserveRequest) Save(db *gorm.DB) {
 	db.FirstOrCreate(&r)
 }
 
-func (r *ReserveRequest) DeleteFromDB(db *gorm.DB) {
+func (r *ReserveRequest) Update(db *gorm.DB) {
+
+}
+
+func (r *ReserveRequest) Delete(db *gorm.DB) {
 	db.Delete(r)
 }
