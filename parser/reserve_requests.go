@@ -14,7 +14,6 @@ func writeToFile(text string) {
 		panic(err)
 	}
 	defer f.Close()
-
 	if _, err = f.WriteString(text + "\n"); err != nil {
 		panic(err)
 	}

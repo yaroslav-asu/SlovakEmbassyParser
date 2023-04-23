@@ -26,11 +26,11 @@ func NewParser() Parser {
 }
 
 func (p *Parser) SaveToDB(model models.DbModel) {
-	model.SaveToDB(p.DB)
+	model.Save(p.DB)
 }
 
 func (p *Parser) DeleteFromDB(model models.DbModel) {
-	model.DeleteFromDB(p.DB)
+	model.Delete(p.DB)
 }
 
 func (p *Parser) Deconstruct() {

@@ -5,6 +5,7 @@ import (
 )
 
 type DbModel interface {
-	SaveToDB(db *gorm.DB)
-	DeleteFromDB(db *gorm.DB)
+	Save(db *gorm.DB)
+	Update(db *gorm.DB)
+	Delete(db *gorm.DB)
 }

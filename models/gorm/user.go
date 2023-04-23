@@ -10,9 +10,14 @@ type User struct {
 	TelegramId string
 }
 
-func (u *User) SaveToDB(db *gorm.DB) {
+func (u *User) Save(db *gorm.DB) {
 	db.FirstOrCreate(u)
 }
-func (u *User) DeleteFromDB(db *gorm.DB) {
+
+func (u *User) Update(db *gorm.DB) {
+
+}
+
+func (u *User) Delete(db *gorm.DB) {
 	db.Delete(u)
 }

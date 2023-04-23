@@ -19,7 +19,7 @@ func (s *Session) SaveCookiesToDb() {
 	dataBase := db.Connect()
 	defer db.Close(dataBase)
 	for _, cookie := range s.Client.Jar.Cookies(siteUrl) {
-		gorm_models.NewCookie(s.User, *cookie).SaveToDB(dataBase)
+		gorm_models.NewCookie(s.User, *cookie).SaveOrCreate(dataBase)
 	}
 }
 
@@ -30,5 +30,6 @@ func (s *Session) savedSessionCookies() []gorm_models.Cookie {
 	var cookies []gorm_models.Cookie
 	dataBase.Preload(clause.Associations).Find(&cookies)
 	dataBase.Model(&gorm_models.Cookie{}).Joins(" join users on cookies.user_id = users.id").Where("user_name = ?", s.User.UserName).Find(&cookies)
+	zap.L().Info("Got session cookies")
 	return cookies
 }

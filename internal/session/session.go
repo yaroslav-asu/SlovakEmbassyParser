@@ -60,7 +60,7 @@ func NewLoggedInSession(username, password string) Session {
 
 func isLoggedIn(root soup.Root) bool {
 	if len(root.FindAll("input", "id", "j_username")) > 0 || len(root.FindAll("input", "id", "j_password")) > 0 {
-		zap.L().Warn("Session expired")
+		zap.L().Info("Session expired")
 		return false
 	}
 	zap.L().Info("Session still work")
