@@ -5,7 +5,20 @@ import (
 	"main/models/gorm/datetime"
 	"main/parser/user"
 	"os"
+	"time"
 )
+
+func writeToFile(text string) {
+	f, err := os.OpenFile("log.txt", os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	if _, err = f.WriteString(text + "\n"); err != nil {
+		panic(err)
+	}
+}
 
 func (p *Parser) RunCheckingReserveRequests() {
 	var userModel gorm_models.User
@@ -22,6 +35,7 @@ func (p *Parser) RunCheckingReserveRequests() {
 			for _, dayCell := range p.GetWorkingDaysInMonth(city, currentDate) {
 				p.DB.Preload("City").Find(&dayCell)
 				if dayCell.AvailableReservations > 0 {
+					writeToFile(time.Now().Format(time.DateTime))
 					availableReservations, _ := p.GetReservations(city, dayCell.Date)
 					for _, reservation := range availableReservations {
 						if mainUser.ReserveDatetime(city, reservation.Date) {
@@ -41,6 +55,7 @@ func (p *Parser) RunCheckingReserveRequests() {
 			for _, dayCell := range p.GetWorkingDaysInMonth(city, currentDate) {
 				p.DB.Preload("City").Find(&dayCell)
 				if dayCell.AvailableReservations > 0 {
+					writeToFile(time.Now().Format(time.DateTime))
 					availableReservations, _ := p.GetReservations(city, dayCell.Date)
 					for _, reservation := range availableReservations {
 						if mainUser.ReserveDatetime(city, reservation.Date) {
