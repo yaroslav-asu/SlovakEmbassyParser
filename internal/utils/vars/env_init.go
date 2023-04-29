@@ -7,14 +7,15 @@ import (
 )
 
 var (
-	SiteUrl             string
-	DefaultUserName     string
-	DefaultUserPassword string
-	RunningMode         string
-	RuCaptchaApiKey     string
-	DbUser              string
-	DbPassword          string
-	DbName              string
+	SiteUrl                 string
+	DefaultUserName         string
+	DefaultUserPassword     string
+	RunningMode             string
+	RuCaptchaApiKey         string
+	DbUser                  string
+	DbPassword              string
+	DbName                  string
+	CaptchaSolveProjectPath string
 )
 
 func InitDefaultEnv() {
@@ -28,6 +29,7 @@ func InitDefaultEnv() {
 	DefaultUserPassword = os.Getenv("DEFAULT_USER_PASSWORD")
 	RunningMode = os.Getenv("RUNNING_MODE")
 	RuCaptchaApiKey = os.Getenv("RUCAPTCHA_API_KEY")
+	CaptchaSolveProjectPath = os.Getenv("CAPTCHA_SOLVE_PROJECT_PATH")
 	zap.L().Info("Finished initializing environmental vars")
 }
 
