@@ -2,17 +2,16 @@ package gorm
 
 import (
 	"gorm.io/gorm"
-	"main/models/gorm/datetime"
 )
 
 type ReserveRequest struct {
-	Id     uint `gorm:"primaryKey"`
-	UserId int
-	User   User
-	CityId string
-	City   City
-	Start  datetime.Date
-	End    datetime.Date
+	Id      uint `gorm:"primaryKey"`
+	UserId  int
+	User    User
+	CityId  string
+	City    City
+	MonthId uint
+	Month   Month
 }
 
 func (r *ReserveRequest) Save(db *gorm.DB) {

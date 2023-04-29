@@ -27,7 +27,7 @@ func (r Reservation) Delete(db *gorm.DB) {
 	db.Where("date = ? and id = ?", r.Date, r.CityId).Delete(&r)
 }
 
-type Reservations []models.DbModel
+type Reservations []models.DBModel
 
 func (r Reservations) SaveToDB(db *gorm.DB) {
 	for reservationId := range r {

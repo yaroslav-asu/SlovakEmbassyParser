@@ -24,6 +24,7 @@ func Init() {
 		&gorm_models.City{},
 		&gorm_models.DayCell{},
 		&gorm_models.Cookie{},
+		&gorm_models.Month{},
 	)
 	if err != nil {
 		zap.L().Error("failed to auto migrate database")
