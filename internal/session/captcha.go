@@ -74,10 +74,14 @@ func (s *Session) GetCaptchaSolve() string {
 }
 
 func (s *Session) solveCaptcha() string {
-	s.SendCaptchaToSolve()
-	s.captcha.DeleteCaptcha()
-	time.Sleep(CaptchaSolveWaitTime)
-	solve := s.GetCaptchaSolve()
+	solve, err := s.captcha.PredictSolve()
+	if err != nil {
+		zap.L().Info("Error in prediction captcha solve, starting to get solve from rucaptcha")
+		s.SendCaptchaToSolve()
+		time.Sleep(CaptchaSolveWaitTime)
+		solve = s.GetCaptchaSolve()
+	}
+	s.captcha.Rename(solve)
 	zap.L().Info("Got captcha solve: " + solve)
 	return solve
 }
