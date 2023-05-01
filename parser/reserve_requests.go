@@ -2,10 +2,10 @@ package parser
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"main/internal/utils/db"
 	"main/internal/utils/funcs"
 	gorm_models "main/models/gorm"
-	"main/models/gorm/datetime"
 	"main/parser/user"
 )
 
@@ -25,27 +25,36 @@ func (p *Parser) reserveRequestsMonth() []gorm_models.Month {
 	return months
 }
 
-func (p *Parser) firstReserveMonthUser(city gorm_models.City) user.User {
+func (p *Parser) firstReserveMonthUser(city gorm_models.City) (user.User, error) {
 	var userModel gorm_models.User
-	p.DB.Raw("SELECT Distinct \"user_id\", \"user_name\", \"password\",  \"city_id\"  FROM \"reserve_requests\" Join users u on reserve_requests.user_id = u.id where city_id = ? order by user_id", city.Id).First(&userModel)
-	return user.NewUserFromModel(userModel)
+	err := p.DB.Raw("SELECT Distinct \"user_id\", \"user_name\", \"password\",  \"city_id\"  FROM \"reserve_requests\" Join users u on reserve_requests.user_id = u.id where city_id = ? order by user_id", city.Id).First(&userModel).Error
+	return user.NewUserFromModel(userModel), err
 }
 
 func (p *Parser) ParseReserveRequestsInterval(months []gorm_models.Month) {
 	for _, month := range months {
 		fmt.Println(month.Format())
 		var cities []gorm_models.City
+		var err error
 		p.DB.Raw("SELECT DISTINCT * from \"reserve_requests\" join cities c on reserve_requests.city_id = c.id where month_id = ?", month.Id).Find(&cities)
 		for _, city := range cities {
 			dayCells := p.DayCellsWithReservationsInMonth(city, month.Date)
 			var userToReserve user.User
 			if len(dayCells) > 0 {
-				userToReserve = p.firstReserveMonthUser(city)
+				userToReserve, err = p.firstReserveMonthUser(city)
+				if err != nil {
+					zap.L().Error("Failed: " + err.Error())
+					continue
+				}
 			}
 			for i := 0; i < len(dayCells); i++ {
 				availableReservations, _ := p.ReservationsInDay(city, dayCells[i].Date)
 				if i < len(dayCells)-1 && userToReserve.ReserveDatetime(city, availableReservations[0].DateTime) {
-					userToReserve = p.firstReserveMonthUser(city)
+					userToReserve, err = p.firstReserveMonthUser(city)
+					if err != nil {
+						zap.L().Info("Users dont found")
+						break
+					}
 				}
 			}
 		}
@@ -54,8 +63,6 @@ func (p *Parser) ParseReserveRequestsInterval(months []gorm_models.Month) {
 }
 
 func (p *Parser) StartReserveRequestsParsing() {
-	// TODO remove kludge
-	p.moveToMonth(gorm_models.City{Id: "601", Name: "Saint Peretrburg"}, datetime.Now())
 	for months := p.reserveRequestsMonth(); len(months) > 0; months = p.reserveRequestsMonth() {
 		p.ParseReserveRequestsInterval(months)
 		funcs.Sleep()
