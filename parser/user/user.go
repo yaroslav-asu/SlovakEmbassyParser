@@ -7,6 +7,7 @@ import (
 	gorm_models "main/models/gorm"
 	"main/models/gorm/datetime"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -57,6 +58,15 @@ func (u *User) ReserveDatetime(city gorm_models.City, date datetime.Date) bool {
 	res = u.Session.Get(funcs.Linkify("logout.do"))
 	defer res.Body.Close()
 	u.Session.User.IsReserved = u.IsReserved()
+	if !u.Session.User.IsReserved {
+		zap.L().Info("Failed to reserve user, trying again")
+		for i := 0; i < 3; i++ {
+			zap.L().Info(strconv.Itoa(i+1) + " try to reserve user")
+			if u.ReserveDatetime(city, date) {
+				return true
+			}
+		}
+	}
 	return u.Session.User.IsReserved
 }
 

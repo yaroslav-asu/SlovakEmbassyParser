@@ -42,11 +42,6 @@ func Connect() *gorm.DB {
 		reconnectTime *= 2
 		return Connect()
 	}
-	err = db.AutoMigrate(&gorm_models.Reservation{}, &gorm_models.City{}, &gorm_models.ReserveRequest{}, &gorm_models.User{})
-	if err != nil {
-		zap.L().Error("failed to auto migrate database")
-		zap.L().Info("Continuing without auto migration")
-	}
 	return db
 }
 

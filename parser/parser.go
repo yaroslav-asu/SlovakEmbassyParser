@@ -16,10 +16,15 @@ type Parser struct {
 	Date    gorm_models.Date
 }
 
+func NewLoggedInParser() Parser {
+	parser := NewParser()
+	parser.Session.LogIn()
+	return parser
+}
 func NewParser() Parser {
 	now := time.Now()
 	return Parser{
-		Session: session.NewLoggedInSession(vars.DefaultUserName, vars.DefaultUserPassword),
+		Session: session.NewSession(vars.DefaultUserName, vars.DefaultUserPassword),
 		DB:      db.Connect(),
 		Date:    gorm_models.NewDateYM(now.Year(), int(now.Month())),
 	}

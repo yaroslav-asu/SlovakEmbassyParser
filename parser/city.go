@@ -38,7 +38,7 @@ func (p *Parser) ParseCitiesWithWorkingEmbassies() {
 func (p *Parser) isEmbassyWorksInMonth(city gorm_models.City, date datetime.Date) string {
 	zap.L().Info("Checking does: " + city.Name + " with id: " + city.Id + " works in: " + date.Format(datetime.MonthAndYear))
 	funcs.SleepTime(15, 20)
-	doc := p.GetMonthSoup(city, date)
+	doc := p.getMonthSoup(city, date)
 	dayCells := doc.FindAll("td", "class", "calendarMonthCell")
 	if len(dayCells) == 0 {
 		zap.L().Info("Embassy in " + city.Name + " with id: " + city.Id + " at: " + date.Format(datetime.MonthAndYear) + " doesn't work")
@@ -55,7 +55,7 @@ func (p *Parser) isEmbassyWorksInMonth(city gorm_models.City, date datetime.Date
 func (p *Parser) GetEmbassyWorkingMonths(city gorm_models.City) (datetime.Date, datetime.Date) {
 	zap.L().Info("Started checking embassy in " + city.Name + " with id: " + city.Id)
 	funcs.SleepTime(15, 20)
-	now := datetime.NewDateNow()
+	now := datetime.Now()
 	checkingDate := datetime.NewDateYM(now.Year(), now.Month())
 	start := datetime.NewBlankDate()
 	var end datetime.Date

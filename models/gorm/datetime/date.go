@@ -52,7 +52,7 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 	return (*time.Time)(d).UnmarshalJSON(b)
 }
 
-func NewDateNow() Date {
+func Now() Date {
 	return Date(time.Now())
 }
 
@@ -144,12 +144,14 @@ func stringsToIntArray(stringArr []string) []int {
 }
 
 func ParseDateFromString(dateString string) Date {
+	//TODO add format arg
 	dateElements := strings.Split(dateString, ".")
 	if len(dateElements) != 3 {
-		zap.L().Error("Got unexpect string to parse month cell Date: " + dateString)
+		zap.L().Error("Got unexpect string to parse month cell DateTime: " + dateString)
 		return NewBlankDate()
 	}
 	intDate := stringsToIntArray(dateElements)
 	day, month, year := intDate[0], intDate[1], intDate[2]
+
 	return NewDateYMD(year, month, day)
 }

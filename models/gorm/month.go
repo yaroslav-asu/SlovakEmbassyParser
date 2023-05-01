@@ -1,6 +1,7 @@
 package gorm
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"main/models/gorm/datetime"
@@ -11,7 +12,7 @@ type Month struct {
 	Date datetime.Date
 }
 
-func newMonth(date datetime.Date) Month {
+func NewMonth(date datetime.Date) Month {
 	return Month{
 		Date: date,
 	}
@@ -24,4 +25,8 @@ func (m Month) Save(db *gorm.DB) {
 
 func (m Month) Delete(db *gorm.DB) {
 	db.Where("id = ?", m.Id).Delete(&m)
+}
+
+func (m Month) Format() string {
+	return fmt.Sprintf("Month{DateTime: %s}", m.Date.Format(datetime.MonthAndYear))
 }
