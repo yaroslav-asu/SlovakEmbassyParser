@@ -8,21 +8,26 @@ import (
 	"main/models/gorm/datetime"
 	"math"
 	"strconv"
+	"strings"
 )
 
-//TODO complit functions
-//func (p *Parser) monthDate(root soup.Root) (datetime.Date, error) {
-//	monthDate := root.Find("td", "class", "calendarMonthLabel")
-//	if monthDate.Error != nil {
-//		return datetime.Date{}, monthDate.Error
-//	}
-//	datetime.ParseDateFromString() strings.Split(monthDate.FullText(), " ")[0]
-//	return
-//}
-//
-//func (p *Parser) CurrentMonth() {
-//	return p.stepToMonth(gorm_models.City{Id: "601", Name: "Saint-Petersburg"}, 0)
-//}
+func (p *Parser) monthDate(root soup.Root) (datetime.Date, error) {
+	monthDate := root.Find("td", "class", "calendarMonthLabel")
+	if monthDate.Error != nil {
+		return datetime.Date{}, monthDate.Error
+	}
+	return datetime.ParseDateFromString(datetime.SiteMonthYear, strings.Split(funcs.StripString(monthDate.FullText()), " ")[0])
+}
+
+func (p *Parser) CurrentMonth() (datetime.Date, error) {
+	root := p.stepToMonth(gorm_models.City{Id: "601", Name: "Saint-Petersburg"}, 0)
+	date, err := p.monthDate(root)
+	if err != nil {
+		zap.L().Error("Failed to get current date")
+		return datetime.Date{}, err
+	}
+	return date, nil
+}
 
 func (p *Parser) stepToMonth(city gorm_models.City, delta int) soup.Root {
 	var res soup.Root
@@ -75,7 +80,11 @@ func (p *Parser) getWorkingDaysInMonth(city gorm_models.City, date datetime.Date
 		}
 		dateText := funcs.StripString(dateNode.Text()) + strconv.Itoa(date.Year())
 		availableReservations := availableReservationsInDay(reservationData)
-		date := datetime.ParseDateFromString(dateText)
+		date, err := datetime.ParseDateFromString(datetime.DateOnly, dateText)
+		if err != nil {
+			zap.L().Error("Failed to get parsed date, continuing")
+			continue
+		}
 		dayCell := gorm_models.DayCell{
 			AvailableReservations: availableReservations,
 			CityId:                city.Id,

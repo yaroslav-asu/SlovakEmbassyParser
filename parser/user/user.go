@@ -36,6 +36,12 @@ func NewUser(username, password string) User {
 
 func NewUserFromModel(user gorm_models.User) User {
 	return User{
+		Session: session.NewSession(user.UserName, user.Password),
+	}
+}
+
+func NewLoggedInUserFromModel(user gorm_models.User) User {
+	return User{
 		Session: session.NewLoggedInSession(user.UserName, user.Password),
 	}
 }

@@ -1,7 +1,7 @@
 package parser
 
 func (p *Parser) LogIn() {
-	p.Session.LogInOnline()
+	p.Session.LogIn()
 }
 
 func (p *Parser) LogOut() {

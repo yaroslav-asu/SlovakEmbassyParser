@@ -43,7 +43,7 @@ func (p *Parser) ParseReserveRequestsInterval(months []gorm_models.Month) {
 			if len(dayCells) > 0 {
 				userToReserve, err = p.firstReserveMonthUser(city)
 				if err != nil {
-					zap.L().Error("Failed: " + err.Error())
+					zap.L().Info("Users didn't find")
 					continue
 				}
 			}
@@ -52,7 +52,7 @@ func (p *Parser) ParseReserveRequestsInterval(months []gorm_models.Month) {
 				if i < len(dayCells)-1 && userToReserve.ReserveDatetime(city, availableReservations[0].DateTime) {
 					userToReserve, err = p.firstReserveMonthUser(city)
 					if err != nil {
-						zap.L().Info("Users dont found")
+						zap.L().Info("Users didn't find")
 						break
 					}
 				}
