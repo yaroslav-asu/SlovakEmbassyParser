@@ -19,7 +19,7 @@ func monthDate(root soup.Root) (datetime.Date, error) {
 	return datetime.ParseDateFromString(datetime.SiteMonthYear, strings.Split(funcs.StripString(monthDate.FullText()), " ")[0])
 }
 
-func (s *Session) CurrentMonth() (datetime.Date, error) {
+func (s *Session) GetDate() (datetime.Date, error) {
 	root := s.stepToMonth(gorm_models.City{Id: "601", Name: "Saint-Petersburg"}, 0)
 	date, err := monthDate(root)
 	if err != nil {
@@ -49,6 +49,7 @@ func (s *Session) moveToMonth(city gorm_models.City, date datetime.Date) []soup.
 		delta = int(math.Copysign(1, float64(monthMoveCount)))
 		for ; monthMoveCount != 0; monthMoveCount -= delta {
 			responses = append(responses, s.stepToMonth(city, delta))
+			zap.L().Info("Moved to: " + s.Date.Format(datetime.MonthAndYear))
 		}
 	} else {
 		responses = []soup.Root{s.stepToMonth(city, 0)}
