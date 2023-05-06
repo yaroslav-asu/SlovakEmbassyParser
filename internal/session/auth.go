@@ -1,10 +1,12 @@
 package session
 
 import (
+	"errors"
 	"go.uber.org/zap"
 	"main/internal/utils/db"
 	"main/internal/utils/funcs"
 	"main/internal/utils/vars"
+	"main/models/gorm/datetime"
 	"net/http"
 	"net/url"
 )
@@ -57,6 +59,19 @@ func (s *Session) LogInWithCookies() {
 	root := funcs.ResponseToSoup(res)
 	if isLoggedIn(root) {
 		zap.L().Info("Successfully logged in by cookies")
+		var currentDate datetime.Date
+		i := 0
+		for err := errors.New(""); err != nil && i < 3; i++ {
+			currentDate, err = s.GetDate()
+			if err == nil {
+				s.Date = currentDate
+				zap.L().Info("Successfully got current session date: " + currentDate.Format(datetime.MonthAndYear))
+				break
+			}
+		}
+		if err != nil {
+			zap.L().Warn("Failed to parse current date, starting with standard")
+		}
 	} else {
 		zap.L().Error("Failed to login by cookies")
 	}

@@ -7,7 +7,6 @@ import (
 	"main/internal/utils/vars"
 	"main/models"
 	"main/models/gorm/datetime"
-	"time"
 )
 
 type Parser struct {
@@ -22,11 +21,9 @@ func NewLoggedInParser() Parser {
 	return parser
 }
 func NewParser() Parser {
-	now := time.Now()
 	return Parser{
 		Session: session.NewSession(vars.DefaultUserName, vars.DefaultUserPassword),
 		DB:      db.Connect(),
-		Date:    datetime.NewDateYM(now.Year(), int(now.Month())),
 	}
 }
 
