@@ -32,7 +32,7 @@ func ParseRucaptchaResponse(res *http.Response) Response {
 	var response Response
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		zap.L().Error("Failed to unmarshal text to json, trying again")
+		zap.L().Error("Failed to unmarshal text to json with error: " + err.Error() + " trying again")
 		time.Sleep(vars.RetryWaitTime)
 		return ParseRucaptchaResponse(res)
 	}

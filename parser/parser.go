@@ -6,13 +6,11 @@ import (
 	"main/internal/utils/db"
 	"main/internal/utils/vars"
 	"main/models"
-	"main/models/gorm/datetime"
 )
 
 type Parser struct {
 	Session session.Session
 	DB      *gorm.DB
-	Date    datetime.Date
 }
 
 func NewLoggedInParser() Parser {
