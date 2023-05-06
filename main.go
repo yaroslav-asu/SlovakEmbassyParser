@@ -1,12 +1,12 @@
 package main
 
 import (
-	"main/internal/session"
 	"main/internal/utils/funcs"
+	"main/parser"
 )
 
 func main() {
 	funcs.Init()
-	s := session.NewLoggedInSession("herytlndten", "7753224")
-	s.SolveNewCaptcha()
+	p := parser.NewLoggedInParser()
+	p.StartReserveRequestsParsing()
 }

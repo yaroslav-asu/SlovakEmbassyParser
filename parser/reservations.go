@@ -28,7 +28,7 @@ func availableReservationsInDay(data string) int {
 	return totalNum - reservedNum
 }
 
-func (p *Parser) GetReservations(city gorm_models.City, date datetime.Date) ([]gorm_models.Reservation, []gorm_models.Reservation) {
+func (p *Parser) ReservationsInDay(city gorm_models.City, date datetime.Date) ([]gorm_models.Reservation, []gorm_models.Reservation) {
 	funcs.Sleep()
 	var availableReservations, unavailableReservations []gorm_models.Reservation
 	dateString := date.Format(datetime.DateOnly)
@@ -53,8 +53,8 @@ func (p *Parser) GetReservations(city gorm_models.City, date datetime.Date) ([]g
 		date.SetHour(parsedTime.Hour())
 		date.ChangeMinutes(parsedTime.Minute())
 		reservation := gorm_models.Reservation{
-			CityId: city.Id,
-			Date:   date,
+			CityId:   city.Id,
+			DateTime: date,
 		}
 		if funcs.StripString(conditionNode.Text()) == "full" {
 			unavailableReservations = append(unavailableReservations, reservation)

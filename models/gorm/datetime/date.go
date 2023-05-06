@@ -4,18 +4,17 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"go.uber.org/zap"
-	"strconv"
-	"strings"
 	"time"
 )
 
 type Date time.Time
 
 var (
-	MonthAndYear = "01.2006"
-	DateOnly     = "02.01.2006"
-	DateTime     = "15:04 02.01.2006"
-	FormDateTime = "02.01.2006 15:04"
+	MonthAndYear  = "01.2006"
+	DateOnly      = "02.01.2006"
+	DateTime      = "15:04 02.01.2006"
+	FormDateTime  = "02.01.2006 15:04"
+	SiteMonthYear = "01/2006"
 )
 
 // Scan implementation for Gorm
@@ -52,7 +51,7 @@ func (d *Date) UnmarshalJSON(b []byte) error {
 	return (*time.Time)(d).UnmarshalJSON(b)
 }
 
-func NewDateNow() Date {
+func Now() Date {
 	return Date(time.Now())
 }
 
@@ -130,26 +129,11 @@ func (d *Date) Format(format string) string {
 	return d.Time().Format(format)
 }
 
-func stringsToIntArray(stringArr []string) []int {
-	intArr := make([]int, len(stringArr))
-	for i, s := range stringArr {
-		intEl, err := strconv.Atoi(s)
-		if err != nil {
-			zap.L().Error("Can't convert string to int: " + s)
-			return []int{}
-		}
-		intArr[i] = intEl
+func ParseDateFromString(formatString, dateString string) (Date, error) {
+	parsedTime, err := time.Parse(formatString, dateString)
+	if err != nil {
+		zap.L().Error("Failed to parse date from: " + dateString + " by: " + formatString)
+		return Date{}, err
 	}
-	return intArr
-}
-
-func ParseDateFromString(dateString string) Date {
-	dateElements := strings.Split(dateString, ".")
-	if len(dateElements) != 3 {
-		zap.L().Error("Got unexpect string to parse month cell Date: " + dateString)
-		return NewBlankDate()
-	}
-	intDate := stringsToIntArray(dateElements)
-	day, month, year := intDate[0], intDate[1], intDate[2]
-	return NewDateYMD(year, month, day)
+	return Date(parsedTime), nil
 }

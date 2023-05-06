@@ -1,6 +1,9 @@
 package gorm
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	Id         uint `gorm:"primaryKey"`
@@ -20,4 +23,8 @@ func (u *User) Update(db *gorm.DB) {
 
 func (u *User) Delete(db *gorm.DB) {
 	db.Delete(u)
+}
+
+func (u *User) Format() string {
+	return fmt.Sprintf("User{UserName: %s, Password: %s, IsReserved: %t}", u.UserName, u.Password, u.IsReserved)
 }

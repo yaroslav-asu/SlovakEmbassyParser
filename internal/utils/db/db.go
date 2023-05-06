@@ -24,6 +24,7 @@ func Init() {
 		&gorm_models.City{},
 		&gorm_models.DayCell{},
 		&gorm_models.Cookie{},
+		&gorm_models.Month{},
 	)
 	if err != nil {
 		zap.L().Error("failed to auto migrate database")
@@ -40,11 +41,6 @@ func Connect() *gorm.DB {
 		time.Sleep(reconnectTime)
 		reconnectTime *= 2
 		return Connect()
-	}
-	err = db.AutoMigrate(&gorm_models.Reservation{}, &gorm_models.City{}, &gorm_models.ReserveRequest{}, &gorm_models.User{})
-	if err != nil {
-		zap.L().Error("failed to auto migrate database")
-		zap.L().Info("Continuing without auto migration")
 	}
 	return db
 }

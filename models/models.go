@@ -4,8 +4,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type DbModel interface {
+type DBModel interface {
 	Save(db *gorm.DB)
-	Update(db *gorm.DB)
 	Delete(db *gorm.DB)
+}
+
+type DBModelUpdater interface {
+	Update(db *gorm.DB)
 }

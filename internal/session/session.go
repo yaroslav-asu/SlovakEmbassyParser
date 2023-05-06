@@ -6,6 +6,7 @@ import (
 	"main/internal/session/captcha"
 	"main/internal/utils/db"
 	gorm_models "main/models/gorm"
+	"main/models/gorm/datetime"
 	"net/http"
 	"net/http/cookiejar"
 	"time"
@@ -18,6 +19,7 @@ type Session struct {
 	Proxy   gorm_models.Proxy
 	captcha captcha.Captcha
 	User    gorm_models.User
+	Date    datetime.Date
 }
 
 func NewBlankSession() Session {
@@ -25,11 +27,13 @@ func NewBlankSession() Session {
 	if err != nil {
 		zap.L().Error("Failed to create cookie jar")
 	}
+	now := time.Now()
 	return Session{
 		Client: &http.Client{
 			Timeout: requestTimeout,
 			Jar:     cookieJar,
 		},
+		Date: datetime.NewDateYM(now.Year(), int(now.Month())),
 	}
 }
 

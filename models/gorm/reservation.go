@@ -8,10 +8,10 @@ import (
 )
 
 type Reservation struct {
-	Id     uint `gorm:"primaryKey"`
-	CityId string
-	City   City
-	Date   datetime.Date
+	Id       uint `gorm:"primaryKey"`
+	CityId   string
+	City     City
+	DateTime datetime.Date
 }
 
 func (r Reservation) Save(db *gorm.DB) {
@@ -24,10 +24,10 @@ func (r Reservation) Update(db *gorm.DB) {
 }
 
 func (r Reservation) Delete(db *gorm.DB) {
-	db.Where("date = ? and id = ?", r.Date, r.CityId).Delete(&r)
+	db.Where("date = ? and id = ?", r.DateTime, r.CityId).Delete(&r)
 }
 
-type Reservations []models.DbModel
+type Reservations []models.DBModel
 
 func (r Reservations) SaveToDB(db *gorm.DB) {
 	for reservationId := range r {
