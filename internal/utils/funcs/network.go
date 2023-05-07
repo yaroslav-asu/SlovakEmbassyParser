@@ -18,13 +18,13 @@ func Linkify(linkParts ...string) string {
 	return link
 }
 
-func ResponseToSoup(res *http.Response) soup.Root {
+func ResponseToSoup(res *http.Response) (soup.Root, error) {
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		zap.L().Error("Failed to read response")
-		return soup.Root{}
+		return soup.Root{}, err
 	}
 	html := string(body)
 	res.Body = io.NopCloser(bytes.NewBuffer(body))
-	return soup.HTMLParse(html)
+	return soup.HTMLParse(html), nil
 }

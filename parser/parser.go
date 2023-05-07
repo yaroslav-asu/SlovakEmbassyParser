@@ -18,6 +18,7 @@ func NewLoggedInParser() Parser {
 	parser.Session.LogIn()
 	return parser
 }
+
 func NewParser() Parser {
 	return Parser{
 		Session: session.NewSession(vars.DefaultUserName, vars.DefaultUserPassword),

@@ -30,7 +30,12 @@ func (s *Session) Get(url string) *http.Response {
 		s.handleRequestError(url, err)
 		return s.Get(url)
 	}
-	parsedSoup := funcs.ResponseToSoup(res)
+	parsedSoup, err := funcs.ResponseToSoup(res)
+	if err != nil {
+		zap.L().Info("Trying to repeat request")
+		funcs.Sleep()
+		return s.Get(url)
+	}
 	if !isLoggedIn(parsedSoup) {
 		zap.L().Info("Session cookies aren't valid, starting to log in")
 		s.LogInOnline()
