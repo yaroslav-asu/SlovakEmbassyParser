@@ -12,6 +12,7 @@ import (
 
 type Captcha struct {
 	title       string
+	Solve       string
 	RucaptchaId string
 }
 
@@ -20,11 +21,11 @@ func NewCaptcha(title string) Captcha {
 		title: title,
 	}
 }
-func (c Captcha) Path() string {
+func (c *Captcha) Path() string {
 	return fmt.Sprintf("captcha/%s.png", c.title)
 }
 
-func (c Captcha) Base64() string {
+func (c *Captcha) Base64() string {
 	bytes, err := os.ReadFile(c.Path())
 	if err != nil {
 		zap.L().Error("Failed to open ")
@@ -32,17 +33,18 @@ func (c Captcha) Base64() string {
 	return base64.StdEncoding.EncodeToString(bytes)
 }
 
-func (c Captcha) SolveByInput() string {
-	var textCaptcha string
+func (c *Captcha) SolveByInput() string {
+	var solve string
 	fmt.Print(fmt.Sprintf("Type captcha solve %s: ", c.title))
-	_, err := fmt.Scan(&textCaptcha)
+	_, err := fmt.Scan(&solve)
 	if err != nil {
 		zap.L().Error(err.Error())
 	}
-	return textCaptcha
+	c.Solve = solve
+	return solve
 }
 
-func (c Captcha) PredictSolve() (string, error) {
+func (c *Captcha) PredictSolve() (string, error) {
 	rootDir, err := os.Getwd()
 	if err != nil {
 		zap.L().Error("Failed to get current working directory")
@@ -60,11 +62,11 @@ func (c Captcha) PredictSolve() (string, error) {
 	return string(out), nil
 }
 
-func (c Captcha) Format() string {
+func (c *Captcha) Format() string {
 	return fmt.Sprintf("Captcha{title: %s, RucaptchaId: %s}", c.title, c.RucaptchaId)
 }
 
-func (c Captcha) Delete() {
+func (c *Captcha) Delete() {
 	zap.L().Info("Starting to delete captcha: " + c.Format())
 	err := os.Remove(c.Path())
 	if err != nil {
@@ -72,7 +74,7 @@ func (c Captcha) Delete() {
 	}
 }
 
-func (c Captcha) Rename(newName string) {
+func (c *Captcha) Rename(newName string) {
 	zap.L().Info("Renaming captcha from: " + c.title + " to: " + newName)
 	err := os.Rename(fmt.Sprintf("captcha/%s.png", c.title), fmt.Sprintf("captcha/%s.png", newName))
 	if err != nil {

@@ -4,13 +4,18 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"io"
+	"log"
 	"main/internal/session/captcha"
 	"main/internal/session/captcha/rucaptcha"
+	"main/internal/utils/db"
 	"main/internal/utils/funcs"
 	"main/internal/utils/vars"
+	gorm_models "main/models/gorm"
+	"main/models/gorm/datetime"
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -89,5 +94,63 @@ func (s *Session) solveCaptcha() string {
 func (s *Session) SolveNewCaptcha() string {
 	unproxiedSession := NewBlankSession()
 	unproxiedSession.captcha = s.DownloadCaptcha()
-	return unproxiedSession.solveCaptcha()
+	solve := unproxiedSession.solveCaptcha()
+	s.captcha.Solve = solve
+	return s.captcha.Solve
+}
+
+func (s *Session) CheckCaptchaSolve() bool {
+	now := datetime.NewDateYMD(2023, 5, 10)
+	consularId := "590"
+	res := s.PostForm(
+		funcs.Linkify(fmt.Sprintf("calendarDay.do?day=%s&calendarId=&consularPostId=%s", now.Format(datetime.DateOnly), consularId)),
+		url.Values{
+			"calendar.timeOfVisit":               {now.Format(datetime.DateOnly)},
+			"calendar.sequenceNo":                {""},
+			"calendar.timeSlot.timeSlotId":       {""},
+			"calendar.consularPost.consularPost": {""},
+			"calendar.calendarId":                {""},
+			"captcha":                            {s.captcha.Solve},
+		},
+	)
+	root, err := funcs.ResponseToSoup(res)
+	if err != nil {
+		zap.L().Info("Failed to read check captcha response, quitting with false value")
+		return false
+	}
+	for _, el := range root.FindAll("script") {
+		if strings.Contains(el.FullText(), "captcha") {
+			errParts := strings.Split(funcs.StripString(el.FullText()), ",")
+			zap.L().Info("Captcha solve isn't right: " + errParts[len(errParts)-1])
+			return false
+		}
+	}
+	zap.L().Info("Captcha solve is right")
+	return true
+}
+
+func (s *Session) ParseCaptchas(count int) {
+	for i := 0; i < count; i++ {
+		solve := s.SolveNewCaptcha()
+		var dirName string
+		if s.CheckCaptchaSolve() {
+			dirName = "right"
+		} else {
+			dirName = "wrong"
+		}
+		err := os.Rename(fmt.Sprintf("captcha/%s.png", solve), fmt.Sprintf("captcha/%s/%s.png", dirName, solve))
+		if err != nil {
+			log.Fatal(err)
+		}
+		funcs.SleepTime(5, 20)
+	}
+}
+
+func StartParseCaptchas() {
+	d := db.Connect()
+	defer db.Close(d)
+	var u gorm_models.User
+	d.Model(&gorm_models.User{}).Where("id = 2").First(&u)
+	s := NewLoggedInSession(u.UserName, u.Password)
+	s.ParseCaptchas(100)
 }
