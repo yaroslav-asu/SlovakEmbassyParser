@@ -7,8 +7,10 @@ import (
 	"log"
 	"main/internal/session/captcha"
 	"main/internal/session/captcha/rucaptcha"
+	"main/internal/utils/db"
 	"main/internal/utils/funcs"
 	"main/internal/utils/vars"
+	gorm_models "main/models/gorm"
 	"main/models/gorm/datetime"
 	"net/url"
 	"os"
@@ -142,4 +144,13 @@ func (s *Session) ParseCaptchas(count int) {
 		}
 		funcs.SleepTime(5, 20)
 	}
+}
+
+func StartParseCaptchas() {
+	d := db.Connect()
+	defer db.Close(d)
+	var u gorm_models.User
+	d.Model(&gorm_models.User{}).Where("id = 2").First(&u)
+	s := NewLoggedInSession(u.UserName, u.Password)
+	s.ParseCaptchas(100)
 }
